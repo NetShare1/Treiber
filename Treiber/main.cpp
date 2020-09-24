@@ -6,9 +6,13 @@
 #include <codecvt>
 #include <string>
 #include <setupapi.h>
-#include <stdlib.h>  
+#include <stdlib.h> 
+#include <psapi.h>
+
+#define ARRAY_SIZE 1024
 
 std::string GetLastErrorAsString();
+void listAllDrivers();
 
 int main() {
 	/*
@@ -21,31 +25,51 @@ int main() {
 		  https://docs.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetclassdevsw
 		
 	*/
-	
+
+
+	PDEVINST deviceInstancHandle = new DEVINST();
+
+	// get device instance handle
+	CM_Locate_DevNodeA(deviceInstancHandle, (DEVINSTID_A)L"ROOT/NET/005", CM_LOCATE_DEVNODE_NORMAL);
+
+	if (deviceInstancHandle == INVALID_HANDLE_VALUE) {
+		std::cout << "error" << std::endl;
+	}
+
+	std::cout << GetLastErrorAsString() << std::endl;
+
+	return 0;
+
+
+	/*listAllDrivers();
+
+	return 0;
+	*/
 
 	// returns device information set according to the provided data.
 	HDEVINFO deviceInformationSet = SetupDiGetClassDevsW(
 		nullptr, // pointer to device setup class, don't need that so it can be null
-		(PCWSTR)L"wintun", // takes in an id of an pnp of which we want the information
+		(PCWSTR)L"{4d36e972-e325-11ce-bfc1-08002be10318", // takes in an id of an pnp of which we want the information
+		// NULL, // NULL to get every device node of the device tree
 		NULL, // a handle to the toplevel level window, we dont have one so null
 		DIGCF_ALLCLASSES // access falgs this one makes it so we get a list of all device setup classes
 		// other flags can be found here: https://docs.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetclassdevsw
 	);
 
-	// this will hold the data about the device
-	PSP_DEVINFO_DATA deviceData{};
+	PSP_DEVINFO_DATA deviceData = new SP_DEVINFO_DATA();
+	deviceData->cbSize = sizeof SP_DEVINFO_DATA;
 
 	// im only doing a maximum of 10 itaration because if there are more than 10
 	// than the id of the pnp is probalbly wrong.
 	for (int i{ 0 }; i <= 10; i++) {
 
-		if (i == 10) {
+		/*if (i == 10) {
 			// display error message informing user of wrong id 
 			std::cerr << "There are more than 10 devicesnodes in" <<
 				" the device information sets. The id of the pnp is probably wrong!\n"
 				<< GetLastErrorAsString() << std::endl;
 			exit(EXIT_FAILURE);
-		}
+		}*/
 
 		// retruns data from the device information set
 		// https://docs.microsoft.com/en-us/windows-hardware/drivers/install/device-information-sets
@@ -64,10 +88,28 @@ int main() {
 				exit(EXIT_FAILURE);
 			}
 			std::cout << "No more information in the InformationSet!" << std::endl;
-			break;
+			//break;
 		}
 
 		std::cout << "Found Information with id " << i << std::endl;
+
+		std::cout << "GUID from found device: " 
+			<< deviceData->ClassGuid.Data1 << " "
+			<< deviceData->ClassGuid.Data2 << " "
+			<< deviceData->ClassGuid.Data3 << " "
+			<< deviceData->ClassGuid.Data4 << " "
+			<<  std::endl;
+
+		char* buffer = new char(MAX_CLASS_NAME_LEN);
+
+		SetupDiClassNameFromGuidA(
+			&(deviceData->ClassGuid),
+			buffer,
+			MAX_CLASS_NAME_LEN,
+			NULL
+		);
+
+		std::cout << "className: " << buffer << std::endl << std::endl;
 	}
 
 	/*if (!SetupDiGetDeviceInstanceIdA(
@@ -77,7 +119,7 @@ int main() {
 		std::cerr << "Error recieving device instance id";
 	}*/
 
-	PDEVINST* deviceInstancHandle;
+	//PDEVINST* deviceInstancHandle;
 
 	// get device instance handle
 	//CM_Locate_DevNodeA();
@@ -106,3 +148,35 @@ std::string GetLastErrorAsString()
 
 	return message;
 }
+
+
+void listAllDrivers() {
+	LPVOID drivers[ARRAY_SIZE];
+	DWORD cbNeeded;
+	int cDrivers, i;
+
+	if (EnumDeviceDrivers(drivers, sizeof(drivers), &cbNeeded) && cbNeeded < sizeof(drivers))
+	{
+		TCHAR szDriver[ARRAY_SIZE];
+
+		cDrivers = cbNeeded / sizeof(drivers[0]);
+
+		_tprintf(TEXT("There are %d drivers:\n"), cDrivers);
+
+		for (i = 0; i < cDrivers; i++)
+		{
+			if (GetDeviceDriverBaseName(drivers[i], szDriver, sizeof(szDriver) / sizeof(szDriver[0])))
+			{
+				if (!_tcscmp(szDriver, L"wintun.sys")) { // compares the two strings
+					_tprintf(TEXT("%d: %s\n"), i + 1, szDriver);
+				}
+			}
+		}
+	}
+	else
+	{
+		_tprintf(TEXT("EnumDeviceDrivers failed; array size needed is %d\n"), cbNeeded / sizeof(LPVOID));
+	}
+
+}
+
