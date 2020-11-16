@@ -1,0 +1,14 @@
+#define PACKAGE_NAME "NetShare"
+#define PACKAGE_STRING "NetShare 0.10"
+#define PACKAGE_TARNAME "netshare"
+#define PACKAGE "NetShare"
+#define PRODUCT_VERSION_MAJOR "0"
+#define PRODUCT_VERSION_MINOR "1"
+#define PRODUCT_VERSION_PATCH "0"
+#define PACKAGE_VERSION "0.1.0"
+#define PRODUCT_VERSION "0.1.0"
+#define PRODUCT_BUGREPORT "0"
+#define OPENVPN_VERSION_RESOURCE "none"
+#define TAP_WIN_COMPONENT_ID "NET/0005"
+#define TAP_WIN_MIN_MAJOR 1
+#define TAP_WIN_MIN_MINOR 0
