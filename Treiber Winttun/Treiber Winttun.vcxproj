@@ -125,7 +125,14 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
+    <PostBuildEvent>
+      <Command>XCOPY "$(ProjectDir)"lib\wintun\*.DLL "$(TargetDir)" /D /K /Y</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copy dlls into executing directory</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -144,12 +151,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="adapter.h" />
     <ClInclude Include="init_wintun.h" />
     <ClInclude Include="log.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="log.c" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="main.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
