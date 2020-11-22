@@ -64,7 +64,7 @@ void setIPAddress(
     InitializeUnicastIpAddressEntry(&AddressRow);
     WintunGetAdapterLUID(adapter, &AddressRow.InterfaceLuid);
     AddressRow.Address.Ipv4.sin_family = AF_INET;
-    AddressRow.Address.Ipv4.sin_addr.S_un.S_addr = htonl((ipp1 << 24) | (ipp2 << 16) | (ipp3 << 8) | (ipp4 << 0)); /* 10.6.7.7 */
+    AddressRow.Address.Ipv4.sin_addr.S_un.S_addr = htonl((ipp1 << 24) | (ipp2 << 16) | (ipp3 << 8) | (ipp4 << 0)); 
     AddressRow.OnLinkPrefixLength = subnetbits; /* This is a /24 network */
     DWORD LastError = CreateUnicastIpAddressEntry(&AddressRow);
     if (LastError != ERROR_SUCCESS && LastError != ERROR_OBJECT_ALREADY_EXISTS)

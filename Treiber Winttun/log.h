@@ -5,8 +5,9 @@
 #include "init_wintun.h"
 #include <stdio.h>
 
+
 static void CALLBACK
-ConsoleLogger(_In_ WINTUN_LOGGER_LEVEL Level, _In_z_ const WCHAR* LogLine)
+    ConsoleLogger(_In_ WINTUN_LOGGER_LEVEL Level, _In_z_ const WCHAR* LogLine)
 {
     FILETIME Timestamp;
     GetSystemTimePreciseAsFileTime(&Timestamp);
@@ -42,7 +43,7 @@ ConsoleLogger(_In_ WINTUN_LOGGER_LEVEL Level, _In_z_ const WCHAR* LogLine)
 }
 
 static DWORD
-LogError(_In_z_ const WCHAR* Prefix, _In_ DWORD Error)
+    LogError(_In_z_ const WCHAR* Prefix, _In_ DWORD Error)
 {
     WCHAR* SystemMessage = NULL, * FormattedMessage = NULL;
     FormatMessageW(
@@ -50,27 +51,32 @@ LogError(_In_z_ const WCHAR* Prefix, _In_ DWORD Error)
         NULL,
         HRESULT_FROM_SETUPAPI(Error),
         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        (void*)&SystemMessage,
+        SystemMessage,
         0,
         NULL);
+
+    DWORD_PTR dwptrarr[] = { (DWORD_PTR)Prefix, (DWORD_PTR)Error, (DWORD_PTR)SystemMessage };
+
     FormatMessageW(
         FORMAT_MESSAGE_FROM_STRING | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_ARGUMENT_ARRAY |
         FORMAT_MESSAGE_MAX_WIDTH_MASK,
         SystemMessage ? L"%1: %3(Code 0x%2!08X!)" : L"%1: Code 0x%2!08X!",
         0,
         0,
-        (void*)&FormattedMessage,
+        FormattedMessage,
         0,
-        (va_list*)(DWORD_PTR[]) { (DWORD_PTR)Prefix, (DWORD_PTR)Error, (DWORD_PTR)SystemMessage });
+        (va_list*)dwptrarr
+    );
     if (FormattedMessage)
         ConsoleLogger(WINTUN_LOG_ERR, FormattedMessage);
     LocalFree(FormattedMessage);
     LocalFree(SystemMessage);
+    LocalFree(dwptrarr); // idk if localfree is the right one
     return Error;
 }
 
 static DWORD
-LogLastError(_In_z_ const WCHAR* Prefix)
+    LogLastError(_In_z_ const WCHAR* Prefix)
 {
     DWORD LastError = GetLastError();
     LogError(Prefix, LastError);
@@ -79,7 +85,7 @@ LogLastError(_In_z_ const WCHAR* Prefix)
 }
 
 static void
-Log(_In_ WINTUN_LOGGER_LEVEL Level, _In_z_ const WCHAR* Format, ...)
+    Log(_In_ WINTUN_LOGGER_LEVEL Level, _In_z_ const WCHAR* Format, ...)
 {
     WCHAR LogLine[0x200];
     va_list args;
@@ -88,5 +94,6 @@ Log(_In_ WINTUN_LOGGER_LEVEL Level, _In_z_ const WCHAR* Format, ...)
     va_end(args);
     ConsoleLogger(Level, LogLine);
 }
+
 
 #endif // LOG
