@@ -19,7 +19,7 @@ ReceivePackets(_Inout_ Config conf)
         if (Packet)
         {
             NS_PRINT_PACKET(Packet, PacketSize);
-            WintunReleaseReceivePacket(Session, Packet);
+            WintunReleaseReceivePacket(Session, Packet);            
         }
         else
         {

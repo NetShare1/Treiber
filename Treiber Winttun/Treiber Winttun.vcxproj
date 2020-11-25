@@ -157,7 +157,6 @@
     <ClInclude Include="init_wintun.h" />
     <ClInclude Include="log.h" />
     <ClInclude Include="Logic.h" />
-    <ClInclude Include="UPDPacket.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />

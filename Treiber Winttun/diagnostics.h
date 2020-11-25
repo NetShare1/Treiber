@@ -70,8 +70,11 @@ PrintPacket(_In_ const BYTE* Packet, _In_ DWORD PacketSize)
     {
         Log(WINTUN_LOG_INFO, L"Received packet without room for an IP header");
         return;
-}
+    }
     BYTE IpVersion = Packet[0] >> 4, Proto;
+
+    Log(WINTUN_LOG_INFO, L"IpVersion: %d", IpVersion);
+
     WCHAR Src[46], Dst[46];
     uint16_t Identification = 0;
     if (IpVersion == 4)

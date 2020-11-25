@@ -32,6 +32,20 @@ int main() {
     // Create config object
     Config* conf = new Config();
 
+    conf->driverIpv4Adress.ipp1 = 10;
+    conf->driverIpv4Adress.ipp2 = 0;
+    conf->driverIpv4Adress.ipp3 = 0;
+    conf->driverIpv4Adress.ipp4 = 3;
+
+    conf->serverIpv4Adress.ipp1 = 10;
+    conf->serverIpv4Adress.ipp2 = 0;
+    conf->serverIpv4Adress.ipp3 = 0;
+    conf->serverIpv4Adress.ipp4 = 4;
+
+    conf->serverPort = 3520;
+    conf->driverPort = 3219;
+
+
     conf->adapterHandle = 
         getAdapterHandle(L"Netshare", L"Netshare ADP1");
 
