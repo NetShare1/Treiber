@@ -13,29 +13,59 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Config">
+      <UniqueIdentifier>{d9616e8b-870f-4e35-98b2-f23cd967fc0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Workers">
+      <UniqueIdentifier>{6de0305e-e48c-4329-9dbc-1ec3e1a7dd35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Queue">
+      <UniqueIdentifier>{3f21de3e-78d6-4e46-b38d-a4bc56fcfb0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Diagnostics">
+      <UniqueIdentifier>{3b42bcef-914b-4018-ad9e-ece19c4dda1e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\WinTun">
+      <UniqueIdentifier>{0bd0f611-edb9-40ec-a2f7-7129fc9ee71c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="init_wintun.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="log.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="adapter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Config.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Config</Filter>
     </ClInclude>
-    <ClInclude Include="Logic.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="UPDSocketWorker.h">
+      <Filter>Header Files\Workers</Filter>
+    </ClInclude>
+    <ClInclude Include="WorkPacket.h">
+      <Filter>Header Files\Queue</Filter>
+    </ClInclude>
+    <ClInclude Include="Workqueue.h">
+      <Filter>Header Files\Queue</Filter>
     </ClInclude>
     <ClInclude Include="diagnostics.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Diagnostics</Filter>
+    </ClInclude>
+    <ClInclude Include="log.h">
+      <Filter>Header Files\Diagnostics</Filter>
+    </ClInclude>
+    <ClInclude Include="init_wintun.h">
+      <Filter>Header Files\WinTun</Filter>
+    </ClInclude>
+    <ClInclude Include="adapter.h">
+      <Filter>Header Files\WinTun</Filter>
+    </ClInclude>
+    <ClInclude Include="WinTunLogic.h">
+      <Filter>Header Files\Workers</Filter>
+    </ClInclude>
+    <ClInclude Include="UDPWorkerConfig.h">
+      <Filter>Header Files\Config</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Workqueue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

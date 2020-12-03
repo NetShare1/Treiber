@@ -3,6 +3,8 @@
 
 #ifndef NDEBUG // if in debug
 
+#define NS_DEBUG
+
 #include "init_wintun.h"
 #include "wintun.h"
 #include "log.h"
@@ -18,6 +20,27 @@ typedef PSTR(__stdcall* RtlIpv6AddressToStringW)(
     _In_ const struct in6_addr* Addr,
     _Out_writes_(46) PWSTR S
 );
+
+static uint64_t recieveCounter = 0;
+static uint64_t sendCounter = 0;
+
+// functions are not totally thread safe but doesn't matter
+// if some are not logged as long as the majority is logged
+void addToRecieveCounter() {
+    recieveCounter++;
+}
+
+void addToSendCounter() {
+    sendCounter++;
+}
+
+uint64_t getRecieveCounter() {
+    return recieveCounter;
+}
+
+uint64_t getSendCounter() {
+    return sendCounter;
+}
 
 
 
@@ -116,10 +139,24 @@ PrintPacket(_In_ const BYTE* Packet, _In_ DWORD PacketSize)
 #define NS_PRINT_PACKET PrintPacket
 #define NS_INIT_DIAGNOSTICS initDiagnostics
 
+#define NS_PACKET_RECIEVED addToRecieveCounter
+#define NS_PACKET_SENT addToSendCounter
+#define NS_GET_PACKETS_SENT getSendCounter
+#define NS_GET_PACKETS_RECIEVED getRecieveCounter
+
+#define DLOG Log
+
 #else // if in debug
 
 #define NS_PRINT_PACKET
 #define NS_INIT_DIAGNOSTICS
+
+#define NS_PACKET_RECIEVED
+#define NS_PACKET_SENT
+#define NS_GET_PACKETS_SENT 0
+#define NS_GET_PACKETS_RECIEVED 0
+
+#define DLOG
 
 #endif // NDBUG
 
