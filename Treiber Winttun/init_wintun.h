@@ -1,6 +1,8 @@
 #ifndef INIT_WINTUN
 #define INIT_WINTUN
 
+#include "minitrace.h"
+
 #include "wintun.h"
 
 static WINTUN_CREATE_ADAPTER_FUNC WintunCreateAdapter;
@@ -23,6 +25,7 @@ static WINTUN_ALLOCATE_SEND_PACKET_FUNC WintunAllocateSendPacket;
 static WINTUN_SEND_PACKET_FUNC WintunSendPacket;
 
 static HMODULE InitializeWintun(void) {
+    MTR_SCOPE("Startup", "Initialize Wintun");
     HMODULE Wintun =
         LoadLibraryExW(L"wintun.dll", NULL, LOAD_LIBRARY_SEARCH_APPLICATION_DIR | LOAD_LIBRARY_SEARCH_SYSTEM32);
     if (!Wintun)

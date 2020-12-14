@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Config.h"
+#include <WinSock2.h>
 
 class UDPWorkerConfig {
 public: 
@@ -8,6 +9,8 @@ public:
 
 	NsIpAddress socketIpv4Adress;
 	uint16_t socketPort;
+
+	SOCKET socket;
 
 	// if true udp socket will recieve packets
 	// if false udp socket will send packets

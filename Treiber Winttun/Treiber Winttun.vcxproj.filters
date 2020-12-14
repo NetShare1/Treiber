@@ -28,6 +28,12 @@
     <Filter Include="Header Files\WinTun">
       <UniqueIdentifier>{0bd0f611-edb9-40ec-a2f7-7129fc9ee71c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\NetworkAdapters">
+      <UniqueIdentifier>{6a341d4d-4868-401a-b14f-2fd450ae79d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Diagnostics">
+      <UniqueIdentifier>{8333bedf-e134-4edd-99e7-6591a65b8b26}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Config.h">
@@ -60,6 +66,18 @@
     <ClInclude Include="UDPWorkerConfig.h">
       <Filter>Header Files\Config</Filter>
     </ClInclude>
+    <ClInclude Include="NetworkAdapterList.h">
+      <Filter>Header Files\NetworkAdapters</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkAdapter.h">
+      <Filter>Header Files\NetworkAdapters</Filter>
+    </ClInclude>
+    <ClInclude Include="execute.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="minitrace.h">
+      <Filter>Header Files\Diagnostics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -67,6 +85,9 @@
     </ClCompile>
     <ClCompile Include="Workqueue.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="minitrace.c">
+      <Filter>Source Files\Diagnostics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,6 +1,8 @@
 #ifndef DIAGNOSTICS
 #define DIAGNOSTICS
 
+#include "minitrace.h"
+
 #ifndef NDEBUG // if in debug
 
 #define NS_DEBUG
@@ -21,28 +23,6 @@ typedef PSTR(__stdcall* RtlIpv6AddressToStringW)(
     _Out_writes_(46) PWSTR S
 );
 
-static uint64_t recieveCounter = 0;
-static uint64_t sendCounter = 0;
-
-// functions are not totally thread safe but doesn't matter
-// if some are not logged as long as the majority is logged
-void addToRecieveCounter() {
-    recieveCounter++;
-}
-
-void addToSendCounter() {
-    sendCounter++;
-}
-
-uint64_t getRecieveCounter() {
-    return recieveCounter;
-}
-
-uint64_t getSendCounter() {
-    return sendCounter;
-}
-
-
 
 // load the needed dll
 static HINSTANCE ntdll;
@@ -58,6 +38,7 @@ RtlIpv6AddressToStringW Ipv6PrintAsString;
 // returns fals if the dlls could not be loaded. If this is returened the programm should be exited
 // to not get a runtime error later.
 static void initDiagnostics() {
+    MTR_SCOPE("Diagnostics", __FUNCSIG__);
     ntdll = LoadLibrary(TEXT("ntdll.dll"));
 
     if (!ntdll) {
@@ -89,6 +70,7 @@ static void initDiagnostics() {
 static void
 PrintPacket(_In_ const BYTE* Packet, _In_ DWORD PacketSize)
 {
+    MTR_SCOPE("Diagnostics", __FUNCSIG__);
     if (PacketSize < 20)
     {
         Log(WINTUN_LOG_INFO, L"Received packet without room for an IP header");
@@ -139,11 +121,6 @@ PrintPacket(_In_ const BYTE* Packet, _In_ DWORD PacketSize)
 #define NS_PRINT_PACKET PrintPacket
 #define NS_INIT_DIAGNOSTICS initDiagnostics
 
-#define NS_PACKET_RECIEVED addToRecieveCounter
-#define NS_PACKET_SENT addToSendCounter
-#define NS_GET_PACKETS_SENT getSendCounter
-#define NS_GET_PACKETS_RECIEVED getRecieveCounter
-
 #define DLOG Log
 
 #else // if in debug
@@ -151,13 +128,154 @@ PrintPacket(_In_ const BYTE* Packet, _In_ DWORD PacketSize)
 #define NS_PRINT_PACKET
 #define NS_INIT_DIAGNOSTICS
 
-#define NS_PACKET_RECIEVED
-#define NS_PACKET_SENT
-#define NS_GET_PACKETS_SENT 0
-#define NS_GET_PACKETS_RECIEVED 0
-
 #define DLOG
 
-#endif // NDBUG
+#endif // NS_DEBUG
+
+#include <thread>
+#include <chrono>
+#include <future>
+
+class Statistics {
+public:
+
+    Statistics() {
+#ifdef NS_ENABLE_STATISTICS
+        statsCalcuatorThread = new std::thread([this]() {
+            MTR_META_THREAD_NAME("Statistics Calculator Thread");
+            this->calculateStats();
+        });
+#endif
+    }
+
+    ~Statistics() {
+
+#ifdef NS_ENABLE_STATISTICS
+        exitSignal.set_value();
+        statsCalcuatorThread->join();
+#endif
+    }
+
+    void tunPacketSent() {
+        MTR_SCOPE("Statistics", __FUNCSIG__);
+#ifdef NS_ENABLE_STATISTICS
+        std::lock_guard<std::mutex> lck{ m };
+        tunPacketsSent++;
+#endif // NS_ENABLE_STATISTICS
+    }
+
+    void tunPacketRecieved() {
+        MTR_SCOPE("Statistics", __FUNCSIG__);
+#ifdef NS_ENABLE_STATISTICS
+        std::lock_guard<std::mutex> lck{ m };
+        tunPacketsRecieved++;
+#endif // NS_ENABLE_STATISTICS
+    }
+
+    int getTunPacketsSent() {
+        MTR_SCOPE("Statistics", __FUNCSIG__);
+#ifdef NS_ENABLE_STATISTICS
+        std::lock_guard<std::mutex> lck{ m };
+#endif
+        return tunPacketsSent;
+    }
+
+    int getTunPacketsRecieved() {
+        MTR_SCOPE("Statistics", __FUNCSIG__);
+#ifdef NS_ENABLE_STATISTICS
+        std::lock_guard<std::mutex> lck{ m };
+#endif
+        return tunPacketsRecieved;
+    }
+
+    void udpPacketSent(int bits) {
+        MTR_SCOPE("Statistics", __FUNCSIG__);
+#ifdef NS_ENABLE_STATISTICS
+        std::lock_guard<std::mutex> lck{ m };
+        bitsSentCurrentSecond += bits;
+        udpPacketsSent++;
+#endif // NS_ENABLE_STATISTICS
+    }
+
+    void udpPacketRecieved(int bits) {
+        MTR_SCOPE("Statistics", __FUNCSIG__);
+#ifdef NS_ENABLE_STATISTICS
+        std::lock_guard<std::mutex> lck{ m };
+        udpPacketsRecieved++;
+        bitsRecievedCurrentSecond += bits;
+#endif // NS_ENABLE_STATISTICS
+    }
+
+    int getUdpPacketsSent() {
+        MTR_SCOPE("Statistics", __FUNCSIG__);
+#ifdef NS_ENABLE_STATISTICS
+        std::lock_guard<std::mutex> lck{ m };
+#endif
+        return udpPacketsSent;
+    }
+
+    int getUdpPacketsRecieved() {
+        MTR_SCOPE("Statistics", __FUNCSIG__);
+#ifdef NS_ENABLE_STATISTICS
+        std::lock_guard<std::mutex> lck{ m };
+#endif
+        return udpPacketsRecieved;
+    }
+
+    void calculateStats() {
+        MTR_SCOPE("Statistics", __FUNCSIG__);
+        while (
+            futureObj.wait_for(std::chrono::milliseconds(1000)) == std::future_status::timeout
+            ) {
+
+            bitsRecievedLastSecond = bitsRecievedCurrentSecond;
+            bitsSentLastSecond = bitsSentCurrentSecond;
+
+            bitsRecievedCurrentSecond = 0;
+            bitsSentCurrentSecond = 0;
+
+            if (bitsRecievedLastSecond > maxRecieveThroughput) {
+                maxRecieveThroughput = bitsRecievedLastSecond;
+            }
+
+            if (bitsSentLastSecond > maxSentThroughput) {
+                maxSentThroughput = bitsSentLastSecond;
+            }
+
+            Log(WINTUN_LOG_INFO, L"sending=%d Bits/Second", bitsSentLastSecond);
+            Log(WINTUN_LOG_INFO, L"receiving=%d Bits/Second", bitsRecievedLastSecond);
+
+            operatingSeconds++;
+        }
+        DLOG(WINTUN_LOG_INFO, L"Shutting down Calc thread");
+    }
+
+private:
+    std::mutex m;
+
+    std::thread* statsCalcuatorThread;
+    std::promise<void> exitSignal;
+    std::future<void> futureObj = exitSignal.get_future();
+
+    int tunPacketsRecieved = 0;
+    int tunPacketsSent = 0;
+
+    int udpPacketsRecieved = 0;
+    int udpPacketsSent = 0;
+
+    int bitsSentOverall = 0;
+    int bitsRecievedOverall = 0;
+
+    int bitsRecievedCurrentSecond = 0;
+    int bitsSentCurrentSecond = 0;
+
+    int bitsRecievedLastSecond = 0;
+    int bitsSentLastSecond = 0;
+
+    int maxSentThroughput = 0;
+    int maxRecieveThroughput = 0;
+
+    int operatingSeconds = 0;
+};
 
 #endif // DIAGNOSTICS

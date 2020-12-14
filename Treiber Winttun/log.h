@@ -4,11 +4,13 @@
 #include "wintun.h"
 #include "init_wintun.h"
 #include <stdio.h>
+#include "minitrace.h"
 
 
 static void CALLBACK
     ConsoleLogger(_In_ WINTUN_LOGGER_LEVEL Level, _In_z_ const WCHAR* LogLine)
 {
+    MTR_SCOPE("Logging", __FUNCSIG__);
     FILETIME Timestamp;
     GetSystemTimePreciseAsFileTime(&Timestamp);
     SYSTEMTIME SystemTime;
@@ -45,6 +47,7 @@ static void CALLBACK
 static DWORD
     LogError(_In_z_ const WCHAR* Prefix, _In_ DWORD Error)
 {
+    MTR_SCOPE("Logging", __FUNCSIG__);
     WCHAR* SystemMessage = NULL, * FormattedMessage = NULL;
     FormatMessageW(
         FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_MAX_WIDTH_MASK,
@@ -78,6 +81,7 @@ static DWORD
 static DWORD
     LogLastError(_In_z_ const WCHAR* Prefix)
 {
+    MTR_SCOPE("Logging", __FUNCSIG__);
     DWORD LastError = GetLastError();
     LogError(Prefix, LastError);
     SetLastError(LastError);
@@ -87,6 +91,7 @@ static DWORD
 static void
     Log(_In_ WINTUN_LOGGER_LEVEL Level, _In_z_ const WCHAR* Format, ...)
 {
+    MTR_SCOPE("Logging", __FUNCSIG__);
     WCHAR LogLine[0x200];
     va_list args;
     va_start(args, Format);

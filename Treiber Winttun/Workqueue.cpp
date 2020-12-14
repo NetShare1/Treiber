@@ -7,6 +7,7 @@ void Workqueue::insert(BYTE* Packet, DWORD packetSize)
 
 void Workqueue::insert(WorkPacket* workPacket)
 {
+    MTR_SCOPE("Workqueue", "Inserting Packet");
     // lock the queue while inserting
     std::lock_guard<std::mutex> lock{ m };
 
@@ -17,6 +18,7 @@ void Workqueue::insert(WorkPacket* workPacket)
 
 WorkPacket* Workqueue::remove()
 {
+    MTR_SCOPE("Workqueue", "Removeing Packet");
     std::unique_lock<std::mutex> ulock{ m };
     // Wait until there is something in the queue
     hasPackets.wait(ulock, [this] {return !isEmpty() || released; });

@@ -2,11 +2,12 @@
 
 #include "wintun.h"
 #include "Workqueue.h"
+#include "diagnostics.h"
 
 #include <stdint.h>
 
 // Max size of udp datagram
-#define NS_RECIEVE_BUFFER_SIZE 65535
+#define NS_RECIEVE_BUFFER_SIZE WINTUN_MAX_IP_PACKET_SIZE
 
 class NsIpAddress {
 public:
@@ -23,24 +24,48 @@ public:
 	NsIpAddress()
 		: ipp1{ 0 }, ipp2{ 0 }, ipp3{ 0 }, ipp4{ 0 }
 	{}
+
+	friend bool operator==(const NsIpAddress& lhs, const NsIpAddress& rhs) {
+		return
+			(lhs.ipp1 == rhs.ipp1) &&
+			(lhs.ipp2 == rhs.ipp2) &&
+			(lhs.ipp3 == rhs.ipp3) &&
+			(lhs.ipp4 == rhs.ipp4)
+		;
+	}
+
+	friend bool operator!=(const NsIpAddress& lhs, const NsIpAddress& rhs) {
+		return
+			!(
+				(lhs.ipp1 == rhs.ipp1) &&
+				(lhs.ipp2 == rhs.ipp2) &&
+				(lhs.ipp3 == rhs.ipp3) &&
+				(lhs.ipp4 == rhs.ipp4)
+			)
+			;
+	}
 };
 
 class Config
 {
 public:
 	Config() {
-		this->packetqueue = new Workqueue();
+		this->sendingPacketQueue = new Workqueue();
+		this->recievingPacketQueue = new Workqueue();
 	}
 
 	WINTUN_ADAPTER_HANDLE adapterHandle;
 	WINTUN_SESSION_HANDLE sessionHandle;
 
-	Workqueue* packetqueue;
+	Workqueue* sendingPacketQueue;
+	Workqueue* recievingPacketQueue;
 
 	NsIpAddress winTunAdapterIpv4Adress;
 	
 	NsIpAddress serverIpv4Adress;
 	uint16_t serverPort;
+
+	Statistics stats;
 
 	uint8_t winTunAdapterSubnetBits;
 	

@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{738a9b4b-1426-49bb-9c56-40210e80ed2c}</ProjectGuid>
-    <RootNamespace>TreiberWinttun</RootNamespace>
+    <ProjectGuid>{0ac90b50-e310-4110-a226-8410685718eb}</ProjectGuid>
+    <RootNamespace>test</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -78,8 +78,6 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(IncludePath)</IncludePath>
-    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -116,23 +114,13 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;NS_ENABLE_STATISTICS;NS_PERF_PROFILE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)lib\wintun;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
-    <PostBuildEvent>
-      <Command>XCOPY "$(ProjectDir)"lib\wintun\*.DLL "$(TargetDir)" /D /K /Y</Command>
-    </PostBuildEvent>
-    <PostBuildEvent>
-      <Message>Copy dlls into executing directory</Message>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -142,43 +130,16 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)lib\wintun;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
-    <PostBuildEvent>
-      <Command>XCOPY "$(ProjectDir)"lib\wintun\*.DLL "$(TargetDir)" /D /K /Y</Command>
-    </PostBuildEvent>
-    <PostBuildEvent>
-      <Message>Copy all dlls to target directory</Message>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="adapter.h" />
-    <ClInclude Include="Config.h" />
-    <ClInclude Include="diagnostics.h" />
-    <ClInclude Include="execute.h" />
-    <ClInclude Include="init_wintun.h" />
-    <ClInclude Include="log.h" />
-    <ClInclude Include="minitrace.h" />
-    <ClInclude Include="NetworkAdapter.h" />
-    <ClInclude Include="NetworkAdapterList.h" />
-    <ClInclude Include="WinTunLogic.h" />
-    <ClInclude Include="UDPWorkerConfig.h" />
-    <ClInclude Include="UPDSocketWorker.h" />
-    <ClInclude Include="WorkPacket.h" />
-    <ClInclude Include="Workqueue.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="minitrace.c" />
-    <ClCompile Include="Workqueue.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

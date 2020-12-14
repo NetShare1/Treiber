@@ -15,6 +15,7 @@ WINTUN_ADAPTER_HANDLE getAdapterHandle(
 	const WCHAR* poolName, // Name of the pool of the adapter
 	const WCHAR* adapterName // Name of the adapter
 ) {
+    MTR_SCOPE("Wintun_adapter", __FUNCSIG__);
     // try open adapter
     WINTUN_ADAPTER_HANDLE adapterHandle;
     adapterHandle = WintunOpenAdapter(poolName, adapterName);
@@ -60,6 +61,7 @@ void setIPAddress(
     int ipp3, // third number of ip address
     int ipp4  // fourth number of ip address
 ) {
+    MTR_SCOPE("Wintun_adapter", __FUNCSIG__);
     MIB_UNICASTIPADDRESS_ROW AddressRow;
     InitializeUnicastIpAddressEntry(&AddressRow);
     WintunGetAdapterLUID(adapter, &AddressRow.InterfaceLuid);
