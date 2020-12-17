@@ -136,6 +136,8 @@ PrintPacket(_In_ const BYTE* Packet, _In_ DWORD PacketSize)
 #include <chrono>
 #include <future>
 
+#include "log.h"
+
 class Statistics {
 public:
 
@@ -234,6 +236,9 @@ public:
             bitsRecievedCurrentSecond = 0;
             bitsSentCurrentSecond = 0;
 
+            bitsRecievedOverall += bitsRecievedLastSecond;
+            bitsSentOverall += bitsSentLastSecond;
+
             if (bitsRecievedLastSecond > maxRecieveThroughput) {
                 maxRecieveThroughput = bitsRecievedLastSecond;
             }
@@ -244,6 +249,10 @@ public:
 
             Log(WINTUN_LOG_INFO, L"sending=%d Bits/Second", bitsSentLastSecond);
             Log(WINTUN_LOG_INFO, L"receiving=%d Bits/Second", bitsRecievedLastSecond);
+            Log(WINTUN_LOG_INFO, L"max sending=%d Bits/Second", maxSentThroughput);
+            Log(WINTUN_LOG_INFO, L"max receiving=%d Bits/Second", maxRecieveThroughput);
+            Log(WINTUN_LOG_INFO, L"bits sent=%d", bitsSentOverall);
+            Log(WINTUN_LOG_INFO, L"bits received=%d", bitsRecievedOverall);
 
             operatingSeconds++;
         }
@@ -257,14 +266,14 @@ private:
     std::promise<void> exitSignal;
     std::future<void> futureObj = exitSignal.get_future();
 
-    int tunPacketsRecieved = 0;
-    int tunPacketsSent = 0;
+    long long tunPacketsRecieved = 0;
+    long long tunPacketsSent = 0;
 
-    int udpPacketsRecieved = 0;
-    int udpPacketsSent = 0;
+    long long udpPacketsRecieved = 0;
+    long long udpPacketsSent = 0;
 
-    int bitsSentOverall = 0;
-    int bitsRecievedOverall = 0;
+    long long bitsSentOverall = 0;
+    long long bitsRecievedOverall = 0;
 
     int bitsRecievedCurrentSecond = 0;
     int bitsSentCurrentSecond = 0;

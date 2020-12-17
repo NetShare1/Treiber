@@ -14,11 +14,11 @@ ReceivePackets(_Inout_ Config conf)
     MTR_META_THREAD_NAME("Wintun Receive Thread");
     WINTUN_SESSION_HANDLE Session = conf.sessionHandle;
     HANDLE WaitHandles[] = { WintunGetReadWaitEvent(Session), conf.quitEvent };
-
+    int runFor = 11;
     try {
         while (conf.isRunning)
         {
-            MTR_SCOPE("Wintun_Receive", "Recieving/Processing packet");
+            runFor--;
             DWORD PacketSize;
             BYTE* Packet = WintunReceivePacket(Session, &PacketSize);
             if (Packet)
@@ -46,11 +46,15 @@ ReceivePackets(_Inout_ Config conf)
                 DWORD LastError = GetLastError();
                 switch (LastError)
                 {
-                case ERROR_NO_MORE_ITEMS:
-                    if (WaitForMultipleObjects(_countof(WaitHandles), WaitHandles, FALSE, INFINITE) == WAIT_OBJECT_0) {
-                        continue;
+                case ERROR_NO_MORE_ITEMS: {
+                    if (runFor <= 0) { // should be more performant because this waits about 2ms min
+                        runFor = 11;
+                        if (WaitForMultipleObjects(_countof(WaitHandles), WaitHandles, FALSE, INFINITE) == WAIT_OBJECT_0) {
+                            continue;
+                        }
                     }
-
+                    continue;
+                }
                     Log(WINTUN_LOG_WARN, L"WinTun controller shutting down");
                     return ERROR_SUCCESS;
                 default:
@@ -78,34 +82,36 @@ SendPackets(_Inout_ Config conf)
     try {
         while (conf.isRunning)
         {
-            MTR_SCOPE("Wintun_send", "Getting/Sending Packet");
-            WorkPacket* internalPacket = conf.recievingPacketQueue->remove();
+            uint8_t size;
+            WorkPacket** internalPacket = conf.recievingPacketQueue->getAll(&size);
+            for (uint8_t i = 0; i < size; i++) {
+                MTR_SCOPE("Wintun_send", "Sending multible packets");
+                if (!conf.isRunning) {
+                    return ERROR_SUCCESS;
+                }
+
+                BYTE* sendingPacket = WintunAllocateSendPacket(conf.sessionHandle, internalPacket[i]->packetSize);
             
-            if (!conf.isRunning) {
-                return ERROR_SUCCESS;
+                if (sendingPacket) {
+                    MTR_SCOPE("Wintun_send", "Sending Packet");
+                    std::copy(
+                        internalPacket[i]->packet,
+                        internalPacket[i]->packet + internalPacket[i]->packetSize,
+                        sendingPacket
+                    );
+
+                    WintunSendPacket(conf.sessionHandle, sendingPacket);
+                    DLOG(
+                        WINTUN_LOG_INFO,
+                        L"[-2] Sending Packet on WintunAdpater with length %d",
+                        internalPacket[i]->packetSize
+                    );
+                    conf.stats.tunPacketSent();
+                }
+                else if (GetLastError() != ERROR_BUFFER_OVERFLOW)
+                    return LogLastError(L"[-2] Packet write failed");
             }
-
-            BYTE* sendingPacket = WintunAllocateSendPacket(conf.sessionHandle, internalPacket->packetSize);
-            
-            if (sendingPacket) {
-                MTR_SCOPE("Wintun_send", "Sending Packet");
-                std::copy(
-                    internalPacket->packet,
-                    internalPacket->packet + internalPacket->packetSize,
-                    sendingPacket
-                );
-
-                WintunSendPacket(conf.sessionHandle, sendingPacket);
-                DLOG(
-                    WINTUN_LOG_INFO,
-                    L"[-2] Sending Packet on WintunAdpater with length %d",
-                    internalPacket->packetSize
-                );
-            }
-            else if (GetLastError() != ERROR_BUFFER_OVERFLOW)
-                return LogLastError(L"[-2] Packet write failed");
-
-            delete internalPacket;
+            delete[] internalPacket;
         }
     }
     catch (const std::exception& e) {

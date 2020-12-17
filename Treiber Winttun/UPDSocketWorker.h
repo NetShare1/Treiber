@@ -140,107 +140,30 @@ int WorkSocket(UDPWorkerConfig& conf) {
 	if (!conf.reciever) {
 		int iResult;
 		while (true) {
-			MTR_SCOPE("UDP_Sending", "Getting/Sending Packet");
-			WorkPacket* packet = conf.conf->sendingPacketQueue->remove();
+			uint8_t elements;
+			WorkPacket** packet = conf.conf->sendingPacketQueue->removeTillSize(10, &elements);
+			for (uint8_t i = 0; i < elements; i++) {
 
-			// if the driver has stopped
-			if (!conf.conf->isRunning) {
-				break;
-			}
-			MTR_BEGIN("UDP_Sending", "SendingPacket");
-			iResult = sendto(SendingSocket, (char*)packet->packet, packet->packetSize, 0, (SOCKADDR*)&RecvAddr, sizeof(RecvAddr));
-			MTR_END("UDP_Sending", "SendingPacket");
-			conf.conf->stats.udpPacketSent(packet->packetSize);
-
-			DLOG(
-				WINTUN_LOG_INFO,
-				L"[%d] Sent Datagram to %d.%d.%d.%d:%d from %d.%d.%d.%d:%d with length: %d",
-				conf.uid,
-				conf.conf->serverIpv4Adress.ipp1,
-				conf.conf->serverIpv4Adress.ipp2,
-				conf.conf->serverIpv4Adress.ipp3,
-				conf.conf->serverIpv4Adress.ipp4,
-				conf.conf->serverPort,
-				conf.socketIpv4Adress.ipp1,
-				conf.socketIpv4Adress.ipp2,
-				conf.socketIpv4Adress.ipp3,
-				conf.socketIpv4Adress.ipp4,
-				conf.socketPort,
-				packet->packetSize
-			);
-
-			// delete packet because it is not needed anymore 
-			delete packet->packet;
-			delete packet;
-
-			if (iResult == SOCKET_ERROR) {
-				MTR_SCOPE("UDP_Sending", "Handling Packet Error");
-				if (WSAGetLastError() == WSAEWOULDBLOCK) {
-					continue;
-				}
-				wchar_t* s = NULL;
-				FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-					NULL, WSAGetLastError(),
-					MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-					(LPWSTR)&s, 0, NULL
-				);
-				Log(WINTUN_LOG_WARN,
-					L"sendto failed with error: %s",
-					s
-				);
-				LocalFree(s);
-				return 2819;
-			}
-		}
-	}
-	else {
-
-		BYTE* buffer = new BYTE[NS_RECIEVE_BUFFER_SIZE]();
-
-		int remoteAdressLen = sizeof(RecvAddr);
-
-		const int runForConst = 10;
-		int runFor = runForConst; // run throughs until next wait
-		int currWaitTime = 10; // Wait time in miliseconds
-		int packetsReceivedCurr = 0;
-		int packetsReceivedLast = 0;
-
-		int iResult;
-		while (true) {
-			MTR_SCOPE("UDP_Receiving", "Getting/Processing Packet");
-			// when no data is recieved the thread will be force terminated
-			// and can not clean after himself because this is a blocking function
-			// need to find a solution for that.
-			{
-				MTR_SCOPE("UDP_Receiving", "Receiving Packet");
-				iResult = recvfrom(
-					SendingSocket,
-					(char*)buffer,
-					NS_RECIEVE_BUFFER_SIZE,
-					0,
-					(SOCKADDR*)&RecvAddr,
-					&remoteAdressLen
-				);
-			}
-
-			if (iResult > 0) {
-				MTR_SCOPE("UDP_Receiving", "Processing Packet");
-				packetsReceivedCurr++;
-				BYTE* internalPacket = new BYTE[iResult];
-				std::copy(buffer, buffer + iResult, internalPacket);
-
-				conf.conf->recievingPacketQueue->insert(new WorkPacket(internalPacket, iResult));
-
-				conf.conf->stats.udpPacketRecieved(iResult);
-
-				// if the driver has stopped while blocked
+				MTR_SCOPE("UDP_Sending", "Sending Multible packets");
+				// if the driver has stopped
 				if (!conf.conf->isRunning) {
 					break;
 				}
+				MTR_BEGIN("UDP_Sending", "SendingPacket");
+				iResult = sendto(
+					SendingSocket,
+					(char*)packet[i]->packet,
+					packet[i]->packetSize,
+					0,
+					(SOCKADDR*)&RecvAddr,
+					sizeof(RecvAddr)
+				);
+				MTR_END("UDP_Sending", "SendingPacket");
+				conf.conf->stats.udpPacketSent(packet[i]->packetSize);
 
 				DLOG(
 					WINTUN_LOG_INFO,
-					L"[%d] Recieved Datagram from %d.%d.%d.%d:%d on %d.%d.%d.%d:%d with length: %d",
+					L"[%d] Sent Datagram to %d.%d.%d.%d:%d from %d.%d.%d.%d:%d with length: %d",
 					conf.uid,
 					conf.conf->serverIpv4Adress.ipp1,
 					conf.conf->serverIpv4Adress.ipp2,
@@ -252,14 +175,17 @@ int WorkSocket(UDPWorkerConfig& conf) {
 					conf.socketIpv4Adress.ipp3,
 					conf.socketIpv4Adress.ipp4,
 					conf.socketPort,
-					iResult
+					packet[i]->packetSize
 				);
 
-			}
+				// delete packet because it is not needed anymore 
+				delete packet[i]->packet;
 
-			if (iResult == SOCKET_ERROR) {
-				MTR_SCOPE("UDP_Receiving", "Error Handling Packet");
-				if (WSAGetLastError() != WSAEWOULDBLOCK) {
+				if (iResult == SOCKET_ERROR) {
+					MTR_SCOPE("UDP_Sending", "Handling Packet Error");
+					if (WSAGetLastError() == WSAEWOULDBLOCK) {
+						continue;
+					}
 					wchar_t* s = NULL;
 					FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 						NULL, WSAGetLastError(),
@@ -267,42 +193,146 @@ int WorkSocket(UDPWorkerConfig& conf) {
 						(LPWSTR)&s, 0, NULL
 					);
 					Log(WINTUN_LOG_WARN,
-						L"recvfrom failed with error: %s",
+						L"sendto failed with error: %s",
 						s
 					);
 					LocalFree(s);
-					return 2820;
+					return 2819;
 				}
+
 			}
+			delete[] packet;
+		}
+	}
+	else {
 
-			runFor--;
-			if (runFor == 0) {
-				if (!conf.conf->isRunning) {
-					break;
-				}
+		BYTE* buffer = new BYTE[NS_RECIEVE_BUFFER_SIZE]();
 
-				MTR_SCOPE("UDP_Receiving", "Calculating Wait time and Waiting");
-				if (packetsReceivedCurr != 0 && packetsReceivedCurr >= packetsReceivedLast) {
-					currWaitTime / 2;
-				}
-				if (packetsReceivedCurr == 0 || packetsReceivedCurr < packetsReceivedLast) {
-					if (currWaitTime = 0) {
-						currWaitTime = 1;
-					} else {
-						currWaitTime * 2;
+		int remoteAdressLen = sizeof(RecvAddr);
+
+		/*const int runForConst = 10;
+		int runFor = runForConst; // run throughs until next wait
+		int currWaitTime = 10; // Wait time in miliseconds
+		int packetsReceivedCurr = 0;
+		int packetsReceivedLast = 0;*/
+
+		FD_SET readfds;
+		FD_SET writefds;
+		FD_SET exceptfds;
+
+		FD_ZERO(&readfds);
+		FD_ZERO(&writefds);
+		FD_ZERO(&exceptfds);
+
+		FD_SET(SendingSocket, &readfds);
+
+		timeval timeout{};
+		timeout.tv_sec = 1;
+		timeout.tv_usec = 0;
+
+		int iResult;
+		while (true) {
+			{
+				FD_ZERO(&readfds);
+				FD_ZERO(&writefds);
+				FD_ZERO(&exceptfds);
+
+				FD_SET(SendingSocket, &readfds);
+
+				int total = select(0, &readfds, &writefds, &exceptfds, &timeout);
+
+				if (total == -1) {
+					if (WSAGetLastError() != WSAEWOULDBLOCK) {
+						MTR_SCOPE("UDP_Receiving", "Error Handling critical Packet error");
+						wchar_t* s = NULL;
+						FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+							NULL, WSAGetLastError(),
+							MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+							(LPWSTR)&s, 0, NULL
+						);
+						Log(WINTUN_LOG_WARN,
+							L"[%d] slect failed with error: %s",
+							conf.uid,
+							s
+						);
+						LocalFree(s);
+						return 2820;
+					}
+				} else if (total == 0) {
+					if (!conf.conf->isRunning) {
+						DLOG(WINTUN_LOG_INFO, L"[%d] Shutting down Adapter", conf.uid);
+						return ERROR_SUCCESS;
+					}
+					continue;
+				} else {
+					MTR_SCOPE("UDP_Receiving", "Getting and Processing Packet");
+					{
+						MTR_SCOPE("UDP_Receiving", "Receiving Packet");
+						iResult = recvfrom(
+							SendingSocket,
+							(char*)buffer,
+							NS_RECIEVE_BUFFER_SIZE,
+							0,
+							(SOCKADDR*)&RecvAddr,
+							&remoteAdressLen
+						);
 					}
 
-					if (currWaitTime > 20) {
-						currWaitTime = 20;
+					if (iResult > 0) {
+						MTR_SCOPE("UDP_Receiving", "Processing Packet");
+
+						BYTE* internalPacket = new BYTE[iResult];
+						std::copy(buffer, buffer + iResult, internalPacket);
+
+						conf.conf->recievingPacketQueue->insert(new WorkPacket(internalPacket, iResult));
+
+						conf.conf->stats.udpPacketRecieved(iResult);
+
+						if (!conf.conf->isRunning) {
+							break;
+						}
+
+						DLOG(
+							WINTUN_LOG_INFO,
+							L"[%d] Recieved Datagram from %d.%d.%d.%d:%d on %d.%d.%d.%d:%d with length: %d",
+							conf.uid,
+							conf.conf->serverIpv4Adress.ipp1,
+							conf.conf->serverIpv4Adress.ipp2,
+							conf.conf->serverIpv4Adress.ipp3,
+							conf.conf->serverIpv4Adress.ipp4,
+							conf.conf->serverPort,
+							conf.socketIpv4Adress.ipp1,
+							conf.socketIpv4Adress.ipp2,
+							conf.socketIpv4Adress.ipp3,
+							conf.socketIpv4Adress.ipp4,
+							conf.socketPort,
+							iResult
+						);
+
 					}
+
+					if (iResult == SOCKET_ERROR) {
+						MTR_SCOPE("UDP_Receiving", "Error Handling Packet");
+						if (WSAGetLastError() != WSAEWOULDBLOCK) {
+							MTR_SCOPE("UDP_Receiving", "Error Handling critical Packet error");
+							wchar_t* s = NULL;
+							FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+								NULL, WSAGetLastError(),
+								MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+								(LPWSTR)&s, 0, NULL
+							);
+							Log(WINTUN_LOG_WARN,
+								L"recvfrom failed with error: %s",
+								s
+							);
+							LocalFree(s);
+							return 2820;
+						}
+						Log(WINTUN_LOG_WARN, L"[%d] Read reading buffer without any data init", conf.uid);
+					}
+
 				}
-				packetsReceivedLast = packetsReceivedCurr;
-				packetsReceivedCurr = 0;
-				runFor = runForConst;
-
-				std::this_thread::sleep_for(std::chrono::milliseconds(currWaitTime));
 			}
-
 		}
 		delete buffer;
 	}

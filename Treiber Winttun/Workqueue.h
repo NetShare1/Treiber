@@ -6,16 +6,14 @@
 #include "init_wintun.h"
 #include "WorkPacket.h"
 
-class Workqueue
+class Workqueue : std::queue<WorkPacket*, std::vector<WorkPacket*>>
 {
-public: 
+public:
 
 	Workqueue() {
-		this->queue = new std::queue<WorkPacket*>();
 	}
 
 	~Workqueue() {
-		delete queue;
 	}
 
 	// Inserts a new Workpacket into the queue
@@ -34,19 +32,19 @@ public:
 
 	// Removes as may Workpackets from the queue as fit. If not even one fits
 	// the first one will be returned. So at least one packet will always be returned
-	// WorkPacket* removeTillSize(DWORD size);
+	WorkPacket** removeTillSize(_In_ DWORD size, _Out_ uint8_t* actualSize);
+
+	WorkPacket** getAll(_Out_ uint8_t* size);
 
 	// Returns if the queue is empty.
 	bool isEmpty() {
-		return this->queue->empty();
+		return empty();
 	}
 
 
 private:
 	std::mutex m;
 	std::condition_variable hasPackets;
-
-	std::queue<WorkPacket*>* queue;
 
 	bool released = false;
 };
