@@ -1,3 +1,4 @@
+
 #ifndef DIAGNOSTICS
 #define DIAGNOSTICS
 

@@ -116,7 +116,7 @@ void shutdownWSA() {
 
 int WorkSocket(UDPWorkerConfig& conf) {
 #ifdef NS_PERF_PROFILE
-	std::string threadName = "UDPWorker Thread " + conf.uid; 
+	std::string threadName = "UDPWorker Thread " + conf.uid;
 	threadName += conf.reciever ? " [receiving]" : " [sending]";
 	MTR_META_THREAD_NAME(threadName.c_str());
 #endif
@@ -125,17 +125,17 @@ int WorkSocket(UDPWorkerConfig& conf) {
 	SOCKET SendingSocket = conf.socket;
 	SOCKADDR_IN SocketAddr;
 	SOCKADDR_IN RecvAddr;
-	
+
 	RecvAddr.sin_family = AF_INET;
 	RecvAddr.sin_port = htons(conf.conf->serverPort);
-	RecvAddr.sin_addr.s_addr = 
+	RecvAddr.sin_addr.s_addr =
 		htonl(
 			(conf.conf->serverIpv4Adress.ipp1 << 24) |
 			(conf.conf->serverIpv4Adress.ipp2 << 16) |
-			(conf.conf->serverIpv4Adress.ipp3 << 8 ) |
-			(conf.conf->serverIpv4Adress.ipp4 << 0 )
+			(conf.conf->serverIpv4Adress.ipp3 << 8) |
+			(conf.conf->serverIpv4Adress.ipp4 << 0)
 		);
-	
+
 
 	if (!conf.reciever) {
 		int iResult;
@@ -180,7 +180,7 @@ int WorkSocket(UDPWorkerConfig& conf) {
 
 				// delete packet because it is not needed anymore 
 				try {
-				delete[] packet[i]->packet;
+					delete[] packet[i]->packet;
 				}
 				catch (...) {
 					Log(WINTUN_LOG_WARN, L"Error deleting Packet");
@@ -263,13 +263,15 @@ int WorkSocket(UDPWorkerConfig& conf) {
 						LocalFree(s);
 						return 2820;
 					}
-				} else if (total == 0) {
+				}
+				else if (total == 0) {
 					if (!conf.conf->isRunning) {
 						DLOG(WINTUN_LOG_INFO, L"[%d] Shutting down Adapter", conf.uid);
 						return ERROR_SUCCESS;
 					}
 					continue;
-				} else {
+				}
+				else {
 					MTR_SCOPE("UDP_Receiving", "Getting and Processing Packet");
 					{
 						MTR_SCOPE("UDP_Receiving", "Receiving Packet");

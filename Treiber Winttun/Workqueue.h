@@ -6,45 +6,68 @@
 #include "init_wintun.h"
 #include "WorkPacket.h"
 
-class Workqueue : std::queue<WorkPacket*, std::vector<WorkPacket*>>
-{
+class Workqueue {
 public:
 
-	Workqueue() {
+	Workqueue(size_t _capacity)
+		: capacity{ _capacity }, size{ 0 }, end{ 0 }
+	{
+		buffer = new WorkPacket * [_capacity]();
 	}
 
 	~Workqueue() {
+		for (size_t i = 0; i < size; i++) {
+			delete[] buffer[i]->packet;
+			delete buffer[i];
+		}
+		delete[] buffer;
 	}
 
-	// Inserts a new Workpacket into the queue
-	void insert(BYTE* Packet, DWORD packetSize);
-	void insert(WorkPacket* workPacket);
+	void push(BYTE* Packet, DWORD packetSize);
+	void push(WorkPacket* workPacket);
 
-	// Returns the next Workpacket from the queue
-	WorkPacket* remove();
+	WorkPacket* pop();
+	WorkPacket** popSize(_In_ size_t size, _Out_ size_t* actualSize);
+	WorkPacket** popAll(_Out_ size_t* size);
 
-	// !! This should only be called when the driver is shutting down and
-	// !! config.isRunning is false
 	void releaseAll() {
 		hasPackets.notify_all();
 		released = true;
 	}
 
-	// Removes as may Workpackets from the queue as fit. If not even one fits
-	// the first one will be returned. So at least one packet will always be returned
-	WorkPacket** removeTillSize(_In_ DWORD size, _Out_ uint8_t* actualSize);
-
-	WorkPacket** getAll(_Out_ uint8_t* size);
-
 	// Returns if the queue is empty.
-	bool isEmpty() {
-		return empty();
+	bool empty() {
+		return size == 0;
 	}
 
+	size_t getCapacity() {
+		return capacity;
+	}
+
+	size_t getSize() {
+		return size;
+	}
 
 private:
 	std::mutex m;
 	std::condition_variable hasPackets;
 
 	bool released = false;
+
+	WorkPacket** buffer;
+
+	size_t capacity;
+	size_t size;
+
+	size_t end;
+
+	bool ableToInputPacket();
+	void setSize(size_t size) {
+		this->size = size;
+		if (size == 0) {
+			end = 0;
+			return;
+		}
+		end = this->size - 1;
+	}
 };

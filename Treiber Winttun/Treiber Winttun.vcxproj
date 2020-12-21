@@ -161,6 +161,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="adapter.h" />
+    <ClInclude Include="Application.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="diagnostics.h" />
     <ClInclude Include="execute.h" />
@@ -169,6 +170,7 @@
     <ClInclude Include="minitrace.h" />
     <ClInclude Include="NetworkAdapter.h" />
     <ClInclude Include="NetworkAdapterList.h" />
+    <ClInclude Include="utils.h" />
     <ClInclude Include="WinTunLogic.h" />
     <ClInclude Include="UDPWorkerConfig.h" />
     <ClInclude Include="UPDSocketWorker.h" />
@@ -176,8 +178,11 @@
     <ClInclude Include="Workqueue.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Application.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="minitrace.c" />
+    <ClCompile Include="SourceUPDSocketWorker.cpp" />
+    <ClCompile Include="utils.cpp" />
     <ClCompile Include="Workqueue.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

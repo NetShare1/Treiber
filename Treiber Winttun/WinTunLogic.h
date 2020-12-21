@@ -34,7 +34,7 @@ ReceivePackets(_Inout_ Config conf)
                 BYTE* internalPacket = new BYTE[PacketSize];
                 std::copy(Packet, Packet + PacketSize, internalPacket);
 
-                conf.sendingPacketQueue->insert(new WorkPacket(internalPacket, PacketSize));
+                conf.sendingPacketQueue->push(new WorkPacket(internalPacket, PacketSize));
 
                 conf.stats.tunPacketRecieved();
 
@@ -82,9 +82,9 @@ SendPackets(_Inout_ Config conf)
     try {
         while (conf.isRunning)
         {
-            uint8_t size;
-            WorkPacket** internalPacket = conf.recievingPacketQueue->getAll(&size);
-            for (uint8_t i = 0; i < size; i++) {
+            size_t size;
+            WorkPacket** internalPacket = conf.recievingPacketQueue->popAll(&size);
+            for (size_t i = 0; i < size; i++) {
                 MTR_SCOPE("Wintun_send", "Sending multible packets");
                 if (!conf.isRunning) {
                     return ERROR_SUCCESS;
