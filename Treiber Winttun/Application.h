@@ -1,12 +1,13 @@
 #pragma once
 
+
 #include <WinSock2.h>
 
+#include "adapter.h"
 #include "diagnostics.h"
 #include "log.h"
 #include "init_wintun.h"
 #include "wintun.h"
-#include "adapter.h"
 #include "Config.h"
 #include "UDPWorkerConfig.h"
 #include "WinTunLogic.h"

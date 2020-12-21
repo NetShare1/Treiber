@@ -178,7 +178,10 @@
     <ClInclude Include="Workqueue.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="adapter.cpp" />
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="diagnostics.cpp" />
+    <ClCompile Include="execute.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="minitrace.c" />
     <ClCompile Include="SourceUPDSocketWorker.cpp" />

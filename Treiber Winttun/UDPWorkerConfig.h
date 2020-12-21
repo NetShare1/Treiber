@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Config.h"
-#include <WinSock2.h>
 
 class UDPWorkerConfig {
 public: 

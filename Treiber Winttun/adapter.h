@@ -1,19 +1,19 @@
-#ifndef ADAPTER
-#define ADAPTER
+#pragma once
 
 #include <netioapi.h>
 
 #include "wintun.h"
 #include "log.h"
 
+
 #pragma comment(lib, "iphlpapi.lib")
 #pragma comment(lib, "ws2_32.lib")
 
 // Gets the Handle of the requested Adapter if the adapter does not exist yet
 // the adapter will be created and the handle will be returned after
-WINTUN_ADAPTER_HANDLE getAdapterHandle(
-	const WCHAR* poolName, // Name of the pool of the adapter
-	const WCHAR* adapterName // Name of the adapter
+static WINTUN_ADAPTER_HANDLE getAdapterHandle(
+    const WCHAR* poolName, // Name of the pool of the adapter
+    const WCHAR* adapterName // Name of the adapter
 ) {
     MTR_SCOPE("Wintun_adapter", __FUNCSIG__);
     // try open adapter
@@ -26,7 +26,7 @@ WINTUN_ADAPTER_HANDLE getAdapterHandle(
         L"Trying to get handle of Adapter"
     );
 
-    if (adapterHandle == NULL) { 
+    if (adapterHandle == NULL) {
         // adapter does not exist
         Log(WINTUN_LOG_WARN, L"Adapter does not exist yet will create on: " + GetLastError());
 
@@ -53,7 +53,7 @@ WINTUN_ADAPTER_HANDLE getAdapterHandle(
 }
 
 // Sets the Ip address on the adapter give over the LUID
-void setIPAddress(
+static void setIPAddress(
     WINTUN_ADAPTER_HANDLE adapter,
     UINT8 subnetbits, // how many bits are the subnet
     int ipp1, // first number of ip address
@@ -66,7 +66,7 @@ void setIPAddress(
     InitializeUnicastIpAddressEntry(&AddressRow);
     WintunGetAdapterLUID(adapter, &AddressRow.InterfaceLuid);
     AddressRow.Address.Ipv4.sin_family = AF_INET;
-    AddressRow.Address.Ipv4.sin_addr.S_un.S_addr = htonl((ipp1 << 24) | (ipp2 << 16) | (ipp3 << 8) | (ipp4 << 0)); 
+    AddressRow.Address.Ipv4.sin_addr.S_un.S_addr = htonl((ipp1 << 24) | (ipp2 << 16) | (ipp3 << 8) | (ipp4 << 0));
     AddressRow.OnLinkPrefixLength = subnetbits; /* This is a /24 network */
     DWORD LastError = CreateUnicastIpAddressEntry(&AddressRow);
     if (LastError != ERROR_SUCCESS && LastError != ERROR_OBJECT_ALREADY_EXISTS)
@@ -76,5 +76,3 @@ void setIPAddress(
 
     Log(WINTUN_LOG_INFO, L"Set Ip Adress to: %i.%i.%i.%i/%i", ipp1, ipp2, ipp3, ipp4, subnetbits);
 }
-
-#endif // Adapter

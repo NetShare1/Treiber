@@ -1,11 +1,6 @@
 #pragma once
 
-#include "UDPWorkerConfig.h"
-#include "Log.h"
-#include "WorkPacket.h"
-#include "diagnostics.h"
-
-#include <WinSock2.h>
+#include "UPDSocketWorker.h"
 
 
 int initSocket(UDPWorkerConfig& conf) {

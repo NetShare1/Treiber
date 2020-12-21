@@ -4,7 +4,6 @@
  */
 
 #pragma once
-
 #include <Windows.h>
 #include <IPExport.h>
 #include <ifdef.h>
