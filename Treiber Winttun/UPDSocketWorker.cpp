@@ -136,7 +136,7 @@ int WorkSocket(UDPWorkerConfig& conf) {
 		int iResult;
 		while (true) {
 			size_t elements;
-			WorkPacket** packet = conf.conf->sendingPacketQueue->popSize(10, &elements);
+			WorkPacket** packet = conf.conf->sendingPacketQueue->popSize(3, &elements);
 			for (size_t i = 0; i < elements; i++) {
 
 				MTR_SCOPE("UDP_Sending", "Sending Multible packets");
@@ -174,12 +174,7 @@ int WorkSocket(UDPWorkerConfig& conf) {
 				);
 
 				// delete packet because it is not needed anymore 
-				try {
-					delete[] packet[i]->packet;
-				}
-				catch (...) {
-					Log(WINTUN_LOG_WARN, L"Error deleting Packet");
-				}
+				delete[] packet[i]->packet;
 
 				if (iResult == SOCKET_ERROR) {
 					MTR_SCOPE("UDP_Sending", "Handling Packet Error");

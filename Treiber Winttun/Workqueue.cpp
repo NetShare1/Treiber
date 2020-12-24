@@ -2,78 +2,6 @@
 
 #include "log.h"
 
-/*
-void Workqueue::insert(BYTE* Packet, DWORD packetSize)
-{
-    insert(new WorkPacket(Packet, packetSize));
-}
-
-void Workqueue::insert(WorkPacket* workPacket)
-{
-    MTR_SCOPE("Workqueue", "Inserting Packet");
-    // lock the queue while inserting
-    std::lock_guard<std::mutex> lock{ m };
-
-    push(workPacket);
-
-    hasPackets.notify_one();
-}
-
-WorkPacket* Workqueue::remove()
-{
-    MTR_SCOPE("Workqueue", "Removeing Packet");
-    std::unique_lock<std::mutex> ulock{ m };
-    // Wait until there is something in the queue
-    hasPackets.wait(ulock, [this] {return !isEmpty() || released; });
-
-    if (!released) {
-        WorkPacket* packet = front();
-
-        c.erase(c.begin());
-
-        return packet;
-    }
-    return NULL;
-}
-
-WorkPacket** Workqueue::removeTillSize(_In_ DWORD numberOfElements, _Out_ uint8_t* actualSize)
-{
-    MTR_SCOPE("Workqueue", "Removeing multible Packets");
-    std::unique_lock<std::mutex> ulock{ m };
-    // Wait until there is something in the queue
-    hasPackets.wait(ulock, [this] {return !isEmpty() || released; });
-
-    *actualSize = size() > numberOfElements ? numberOfElements : size();
-    WorkPacket** packets = new WorkPacket * [(*actualSize)]();
-
-    if (!released) {
-        const auto temp = c.data();
-        std::copy(c.data(), c.data() + *actualSize, packets);
-        c.erase(c.begin(), c.begin() + *actualSize);
-        return packets;
-    }
-    delete[] packets;
-    return NULL;
-}
-
-WorkPacket** Workqueue::getAll(_Out_ uint8_t* numberOfElements)
-{
-    MTR_SCOPE("Workqueue", "Removeing all Packets");
-    std::unique_lock<std::mutex> ulock{ m };
-    // Wait until there is something in the queue
-    hasPackets.wait(ulock, [this] {return !isEmpty() || released; });
-
-    *numberOfElements = size();
-    WorkPacket** packets = new WorkPacket * [*numberOfElements]();
-
-    if (!released) {
-        std::copy(c.data(), c.data() + *numberOfElements, packets);
-        c.erase(c.begin(), c.begin() + *numberOfElements);
-        return packets;
-    }
-    delete[] packets;
-    return NULL;
-}*/
 
 void Workqueue::push(BYTE* Packet, DWORD packetSize) {
     push(new WorkPacket(Packet, packetSize));
@@ -90,7 +18,8 @@ void Workqueue::push(WorkPacket* workPacket) {
         delete workPacket;
         return;
     }
-    setSize(size + 1);
+    addToEnd();
+    size++;
     buffer[end] = workPacket;
     hasPackets.notify_one();
 }
@@ -101,9 +30,10 @@ WorkPacket* Workqueue::pop() {
     std::unique_lock<std::mutex> ulock{ m };
     // Wait until there is something in the queue
     hasPackets.wait(ulock, [this] {return !empty() || released; });
-    
-    setSize(size - 1);
-    return buffer[end + 1];
+    size_t oldStart = start;
+    addToStart();
+    size--;
+    return buffer[oldStart];
 }
 
 WorkPacket** Workqueue::popSize(_In_ size_t size, _Out_ size_t* actualSize) {
@@ -112,12 +42,31 @@ WorkPacket** Workqueue::popSize(_In_ size_t size, _Out_ size_t* actualSize) {
     // Wait until there is something in the queue
     hasPackets.wait(ulock, [this] {return !empty() || released; });
     *actualSize = this->size < size ? this->size : size;
+    if (released) return nullptr;
     WorkPacket** list = new WorkPacket * [*actualSize]();
+
+    if (needsSplitt(*actualSize)) {
+        size_t fSplit = getSplitSize();
+        
+        // copy the first part
+        std::copy(&buffer[start], &buffer[start] + fSplit, list);
+
+        // copy the second part
+        std::copy(&buffer[0], &buffer[0] + *actualSize - fSplit, list + fSplit);
+
+        addToStart(*actualSize);
+        this->size -= *actualSize;
+
+        return list;
+    }
+
 
     // if the last element has a lower index than the size we want to get
     // we need to copy twice
-    setSize(this->size - *actualSize);
-    std::copy(&buffer[end], &buffer[end] + *actualSize, list);
+    std::copy(&buffer[start], &buffer[start] + *actualSize, list);
+
+    addToStart(*actualSize);
+    this->size -= *actualSize;
     
     return list;
 }
@@ -131,13 +80,31 @@ WorkPacket** Workqueue::popAll(_Out_ size_t* size) {
     *size = this->size;
     WorkPacket** list = new WorkPacket * [*size]();
     // buffer has no splitt
-    std::copy(&buffer[0], &buffer[0] + *size, list);
-    
-    setSize(0);
+    if (needsSplitt(*size)) {
+        size_t fSplit = getSplitSize();
+
+        // copy the first part
+        std::copy(&buffer[start], &buffer[start] + fSplit, list);
+
+        // copy the second part
+        std::copy(&buffer[0], &buffer[0] + *size - fSplit, list + fSplit);
+        addToStart(*size);
+        
+        this->size -= *size;
+        return list;
+    }
+
+
+    // if the last element has a lower index than the size we want to get
+    // we need to copy twice
+    std::copy(&buffer[start], &buffer[start] + *size, list);
+    addToStart(*size);
+    this->size -= *size;
+
     return list;
 }
 
 bool Workqueue::ableToInputPacket()
 {
-    return !(end == capacity - 1);
+    return !(size == capacity - 1);
 }

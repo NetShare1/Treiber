@@ -1,6 +1,7 @@
 #include "Application.h"
 
 #include "WinTunLogic.h"
+#include "utils.h"
 
 void Application::run()
 {
@@ -35,25 +36,34 @@ void Application::run()
 
     atexit(nsShutdown);
 
-    WaitForMultipleObjectsEx(numberOfWorkers, Workers, TRUE, INFINITE, TRUE);
+    startingUp = false;
+
+    /*
+    // only for testing purposes
+    WaitForMultipleObjectsEx(numberOfWorkers, Workers, TRUE, 15000, TRUE);
+
+    shutdown();*/
 }
 
-bool Application::init()
+bool Application::initRun()
 {
     initProfiling();
 
-    conf = createConfigFromFile("conf.conf");
+    exited = false;
+    startingUp = true;
+
+    conf = createConfigFromFile(confFilePath);
 
     HMODULE Wintun = InitializeWintun();
     if (!Wintun) {
         LogError(L"Failed to initialize Wintun", GetLastError());
+        exited = true;
+        startingUp = false;
         return false;
     }
     DLOG(WINTUN_LOG_INFO, L"Sucessfully loaded wintun dll");
 
     WintunSetLogger(ConsoleLogger);
-
-    NS_INIT_DIAGNOSTICS;
 
     adapterList = new NetworkAdapterList();
     adapterList->init();
@@ -71,7 +81,10 @@ bool Application::init()
 
     if (conf->adapterHandle == NULL) {
         LogLastError(L"Failed to start adapter handle:");
-        exit(2300);
+
+        exited = true;
+        startingUp = false;
+        return false;
     }
 
     // set ip address of  Adapter
@@ -94,18 +107,22 @@ bool Application::init()
         LogLastError(L"Failed to start session");
         WintunFreeAdapter(conf->adapterHandle);
         Log(WINTUN_LOG_INFO, L"Freed Adapter");
-        exit(2200);
+        exited = true;
+        startingUp = false;
+        return false;
     }
 
     DLOG(WINTUN_LOG_INFO, L"Successfully started Session");
 
     DLOG(WINTUN_LOG_INFO, L"Sucessfully inited");
-
-	return true;
 }
 
 void Application::shutdown()
 {
+    if (exited) {
+        return;
+    }
+    exited = true;
     Log(WINTUN_LOG_INFO, L"Shutting down");
     conf->isRunning = false;
     SetEvent(conf->quitEvent);
@@ -115,6 +132,7 @@ void Application::shutdown()
     Log(WINTUN_LOG_INFO, L"Messages Sent on udp sockets: %d", conf->stats.getUdpPacketsSent());
 
     conf->sendingPacketQueue->releaseAll();
+    conf->recievingPacketQueue->releaseAll();
     DLOG(
         WINTUN_LOG_INFO,
         L"Release all blocks"
@@ -135,16 +153,21 @@ void Application::shutdown()
 
     CloseHandle(conf->quitEvent);
 
+    shutdownProfiling();
     Log(WINTUN_LOG_INFO, L"Shutdown successful");
 
+    delete conf;
+    delete[] adapterNames;
+    delete[] udpconfigs;
+}
 
-#ifdef NS_PERF_PROFILE
-    metricsThread->join();
-#endif
+void Application::init(std::string confFilePath)
+{
+    configThread = new std::thread(runConfigurationWorker);
 
-    mtr_flush();
-    mtr_shutdown();
-    exit(EXIT_SUCCESS);
+    this->confFilePath = confFilePath;
+
+    configThread->join();
 }
 
 void Application::initProfiling()
@@ -157,6 +180,7 @@ void Application::initProfiling()
 #ifdef NS_PERF_PROFILE
     metricsThread = new std::thread([]() {
         std::this_thread::sleep_for(std::chrono::seconds(1));
+        Log(WINTUN_LOG_INFO, L"Flushing");
         mtr_flush();
     });
 #endif
@@ -186,25 +210,32 @@ Config* Application::createConfigFromFile(std::string file)
 
 void Application::addConfParameter(std::string value, Config* conf)
 {
+    // remove all whitespace left and right
+    trim(value);
+    // skip comments and empty space
+    if (value.empty() || value.at(0) == '#') {
+        return;
+    }
+
     std::string delimiter = "=";
     std::string key = value.substr(0, value.find(delimiter));
     value.erase(0, value.find(delimiter) + delimiter.length());
     
-    if (key.compare("ADAPTER_IP")) {
+    if (key.compare("ADAPTER_IP") == 0) {
         try {
-            conf->winTunAdapterIpv4Adress = *parseIpString(value);
+            conf->winTunAdapterIpv4Adress = *(parseIpString(value));
         }
         catch (...) {
             Log(WINTUN_LOG_ERR, L"Error parsing Wintun Subnet bits port");
         }
     }
-    else  if (key.compare("ADAPTER_SUBNET_BITS")) {
+    else  if (key.compare("ADAPTER_SUBNET_BITS") == 0) {
         conf->winTunAdapterSubnetBits = atoi(value.c_str());
     }
-    else if (key.compare("SERVER_IP")) {
+    else if (key.compare("SERVER_IP") == 0) {
         conf->serverIpv4Adress = *parseIpString(value);
     }
-    else if (key.compare("SERVER_PORT")) {
+    else if (key.compare("SERVER_PORT") == 0) {
         try {
             conf->serverPort = atoi(value.c_str());
         }
@@ -212,21 +243,11 @@ void Application::addConfParameter(std::string value, Config* conf)
             Log(WINTUN_LOG_ERR, L"Error parsing Server port");
         }
     }
-    else if (key.compare("ADAPTER_NAMES")) {
-        addAdapterNames(value);
+    else if (key.compare("ADAPTER_NAME") == 0) {
+        adapterNames->push_back(value);
     }
     else {
         Log(WINTUN_LOG_WARN, L"Unknown key: %S", key);
-    }
-}
-
-void Application::addAdapterNames(std::string s)
-{
-    std::string delimiter = ";";
-    while (!s.empty()) {
-        std::string value = s.substr(0, s.find(delimiter));
-        s.erase(0, s.find(delimiter) + delimiter.length());
-        adapterNames->push_back(value);
     }
 }
 
@@ -247,6 +268,8 @@ void Application::clearWorkers()
             );
         }
     }
+
+    delete[] Workers;
 }
 
 BOOL Application::handleCtrlSignal(DWORD signal)
@@ -285,13 +308,13 @@ BOOL Application::handleCtrlSignal(DWORD signal)
 
 BOOL __stdcall CtrlHandler(DWORD fdwCtrlType)
 {
-    Application instance = Application::Get();
+    Application* instance = Application::Get();
 
-    return instance.handleCtrlSignal(fdwCtrlType);
+    return instance->handleCtrlSignal(fdwCtrlType);
 }
 
 void nsShutdown() {
-    Application instance = Application::Get();
+    Application* instance = Application::Get();
 
-    instance.shutdown();
+    instance->shutdown();
 }

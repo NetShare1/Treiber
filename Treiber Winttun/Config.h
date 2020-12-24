@@ -1,7 +1,7 @@
 #pragma once
 
 #ifndef NS_QUEUE_SIZE
-#define NS_QUEUE_SIZE 1000
+#define NS_QUEUE_SIZE 100
 #endif
 
 #include "wintun.h"
@@ -56,6 +56,11 @@ public:
 	Config() {
 		this->sendingPacketQueue = new Workqueue(NS_QUEUE_SIZE);
 		this->recievingPacketQueue = new Workqueue(NS_QUEUE_SIZE);
+	}
+
+	~Config() {
+		delete sendingPacketQueue;
+		delete recievingPacketQueue;
 	}
 
 	WINTUN_ADAPTER_HANDLE adapterHandle;

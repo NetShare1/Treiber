@@ -1,9 +1,10 @@
 #include "Application.h"
 
-int main() {
-    Application instance = Application::Get();
+#include "CLI11.hpp"
 
-    if (instance.init()) {
-        instance.run();
-    }
+int main() {
+
+    Application* instance = Application::Get();
+
+    instance->init("conf.conf");
 }

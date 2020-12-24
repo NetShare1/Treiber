@@ -37,6 +37,30 @@
     <Filter Include="Header Files\Application">
       <UniqueIdentifier>{cf683992-1e9e-41f6-ba56-ca4f32dc1258}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Application">
+      <UniqueIdentifier>{c062e5cd-50d8-4786-8398-9d27a3c7f793}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utilities">
+      <UniqueIdentifier>{c842d808-c1de-4649-a4d5-cd0fb2e3a406}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\WinTun">
+      <UniqueIdentifier>{f8298d8a-e683-4475-8377-28cd0d3058f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Workers">
+      <UniqueIdentifier>{cf04f014-c077-47ea-b6e1-2b397babbea1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utilities">
+      <UniqueIdentifier>{fcf55c00-bfbc-4dc6-a0bd-0cfaf447eeb5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Queue">
+      <UniqueIdentifier>{29089935-6417-4182-9f9f-d7d582aeb222}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ConfigurationSocket">
+      <UniqueIdentifier>{5fc91639-9f98-4579-9bd9-3be1f2ada7d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ConfigurationSocket">
+      <UniqueIdentifier>{8366dd9c-1677-4a07-81df-c9023af99c71}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Config.h">
@@ -75,46 +99,61 @@
     <ClInclude Include="NetworkAdapter.h">
       <Filter>Header Files\NetworkAdapters</Filter>
     </ClInclude>
-    <ClInclude Include="execute.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="minitrace.h">
       <Filter>Header Files\Diagnostics</Filter>
     </ClInclude>
     <ClInclude Include="Application.h">
       <Filter>Header Files\Application</Filter>
     </ClInclude>
+    <ClInclude Include="CLI11.hpp">
+      <Filter>Header Files\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="execute.h">
+      <Filter>Header Files\Application</Filter>
+    </ClInclude>
     <ClInclude Include="utils.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="Socket.h">
+      <Filter>Header Files\ConfigurationSocket</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigurationWorker.h">
+      <Filter>Header Files\ConfigurationSocket</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Workqueue.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="minitrace.c">
       <Filter>Source Files\Diagnostics</Filter>
     </ClCompile>
     <ClCompile Include="Application.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SourceUPDSocketWorker.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="diagnostics.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="adapter.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Application</Filter>
     </ClCompile>
     <ClCompile Include="execute.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Application</Filter>
+    </ClCompile>
+    <ClCompile Include="adapter.cpp">
+      <Filter>Source Files\WinTun</Filter>
+    </ClCompile>
+    <ClCompile Include="UPDSocketWorker.cpp">
+      <Filter>Source Files\Workers</Filter>
+    </ClCompile>
+    <ClCompile Include="utils.cpp">
+      <Filter>Source Files\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="diagnostics.cpp">
+      <Filter>Source Files\Diagnostics</Filter>
+    </ClCompile>
+    <ClCompile Include="Workqueue.cpp">
+      <Filter>Source Files\Queue</Filter>
+    </ClCompile>
+    <ClCompile Include="Socket.cpp">
+      <Filter>Source Files\ConfigurationSocket</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigurationWorker.cpp">
+      <Filter>Source Files\ConfigurationSocket</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -6,21 +6,20 @@
 #include "init_wintun.h"
 #include "WorkPacket.h"
 
+#include "log.h"
+
 class Workqueue {
 public:
 
 	Workqueue(size_t _capacity)
 		: capacity{ _capacity }, size{ 0 }, end{ 0 }
 	{
-		buffer = new WorkPacket * [_capacity]();
+		buffer.reset(new WorkPacket * [_capacity]());
 	}
 
 	~Workqueue() {
-		for (size_t i = 0; i < size; i++) {
-			delete[] buffer[i]->packet;
-			delete buffer[i];
-		}
-		delete[] buffer;
+		Log(WINTUN_LOG_WARN, L"Deleting");
+		releaseAll();
 	}
 
 	void push(BYTE* Packet, DWORD packetSize);
@@ -31,7 +30,7 @@ public:
 	WorkPacket** popAll(_Out_ size_t* size);
 
 	void releaseAll() {
-		hasPackets.notify_all();
+		//hasPackets.notify_all();
 		released = true;
 	}
 
@@ -54,20 +53,46 @@ private:
 
 	bool released = false;
 
-	WorkPacket** buffer;
+	std::unique_ptr<WorkPacket*[]> buffer;
 
 	size_t capacity;
 	size_t size;
 
-	size_t end;
+	size_t end = 0;
+	size_t start = 1;
 
-	bool ableToInputPacket();
-	void setSize(size_t size) {
-		this->size = size;
-		if (size == 0) {
+	void addToEnd() {
+		if (end == capacity - 1) {
 			end = 0;
 			return;
 		}
-		end = this->size - 1;
+		end += 1;
 	}
+
+	void addToStart() {
+		if (start == capacity) {
+			start = 0;
+			return;
+		}
+		start += 1;
+	}
+
+	// should only be called when there is no splitt to be made 
+	// check this with needsToSplit();
+	void addToStart(size_t size) {
+		start += size;
+		if (start >= capacity) {
+			start = start - capacity;
+		}
+	}
+
+	bool needsSplitt(size_t wantsToRemove) {
+		return (start + wantsToRemove > capacity);
+	}
+
+	size_t getSplitSize() {
+		return capacity - start;
+	}
+
+	bool ableToInputPacket();
 };

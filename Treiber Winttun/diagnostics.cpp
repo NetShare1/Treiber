@@ -1,6 +1,6 @@
 #include "diagnostics.h"
 
-#ifndef NDEBUG
+#ifdef n
 // !!! THIS FUNCTIONS SHOULD NEVER BE CALLED DIRECTLY !!!
 // !This function must be called before any other diagnostic function!
 // Loads the necessary dlls for the diagnostics

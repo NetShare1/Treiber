@@ -16,6 +16,7 @@
 #include "execute.h"
 #include "minitrace.h"
 #include "utils.h"
+#include "ConfigurationWorker.h"
 
 #include <combaseapi.h>
 #include <synchapi.h>
@@ -32,10 +33,33 @@ class Application
 public:
 
 	void run();
-	bool init();
+	bool initRun();
 	void shutdown();
 
-	static Application& Get() { static Application instance; return instance; }
+	void init(std::string confFilePath);
+
+	bool isRunning() {
+		return !exited;
+	}
+
+	bool isStartingUp() {
+		return startingUp;
+	}
+
+	static Application* Get() {
+		static std::mutex m;
+		static Application* instance;
+		if (NULL == instance)
+		{
+			std::lock_guard<std::mutex> lock{ m };
+
+			if (NULL == instance)
+			{
+				instance = new Application();
+			}
+		}
+		return instance;
+	}
 
 	BOOL handleCtrlSignal(DWORD signal);
 private:
@@ -44,7 +68,6 @@ private:
 
 	Config* createConfigFromFile(std::string file);
 	void addConfParameter(std::string keyValue, _Inout_ Config* conf);
-	void addAdapterNames(std::string);
 
 	void clearWorkers();
 
@@ -56,6 +79,16 @@ private:
 
 	int numberOfWorkers;
 	HANDLE* Workers;
+
+	std::thread* configThread;
+
+	std::string confFilePath;
+
+	bool exited = true;
+	bool startingUp = false;
+
+
+	
 
 #ifdef NS_PERF_PROFILE
 	std::thread* metricsThread;

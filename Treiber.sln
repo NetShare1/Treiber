@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Treiber CSharp impl", "Trei
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Treiber Winttun", "Treiber Winttun\Treiber Winttun.vcxproj", "{738A9B4B-1426-49BB-9C56-40210E80ED2C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test\test.vcxproj", "{0AC90B50-E310-4110-A226-8410685718EB}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NetShareCLI", "NetShareCLI\NetShareCLI.vcxproj", "{BD6D56C2-3E45-4479-95F8-7CE08E1AE1CF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,16 +53,16 @@ Global
 		{738A9B4B-1426-49BB-9C56-40210E80ED2C}.Release|x64.Build.0 = Release|x64
 		{738A9B4B-1426-49BB-9C56-40210E80ED2C}.Release|x86.ActiveCfg = Release|Win32
 		{738A9B4B-1426-49BB-9C56-40210E80ED2C}.Release|x86.Build.0 = Release|Win32
-		{0AC90B50-E310-4110-A226-8410685718EB}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{0AC90B50-E310-4110-A226-8410685718EB}.Debug|x64.ActiveCfg = Debug|x64
-		{0AC90B50-E310-4110-A226-8410685718EB}.Debug|x64.Build.0 = Debug|x64
-		{0AC90B50-E310-4110-A226-8410685718EB}.Debug|x86.ActiveCfg = Debug|Win32
-		{0AC90B50-E310-4110-A226-8410685718EB}.Debug|x86.Build.0 = Debug|Win32
-		{0AC90B50-E310-4110-A226-8410685718EB}.Release|Any CPU.ActiveCfg = Release|Win32
-		{0AC90B50-E310-4110-A226-8410685718EB}.Release|x64.ActiveCfg = Release|x64
-		{0AC90B50-E310-4110-A226-8410685718EB}.Release|x64.Build.0 = Release|x64
-		{0AC90B50-E310-4110-A226-8410685718EB}.Release|x86.ActiveCfg = Release|Win32
-		{0AC90B50-E310-4110-A226-8410685718EB}.Release|x86.Build.0 = Release|Win32
+		{BD6D56C2-3E45-4479-95F8-7CE08E1AE1CF}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{BD6D56C2-3E45-4479-95F8-7CE08E1AE1CF}.Debug|x64.ActiveCfg = Debug|x64
+		{BD6D56C2-3E45-4479-95F8-7CE08E1AE1CF}.Debug|x64.Build.0 = Debug|x64
+		{BD6D56C2-3E45-4479-95F8-7CE08E1AE1CF}.Debug|x86.ActiveCfg = Debug|Win32
+		{BD6D56C2-3E45-4479-95F8-7CE08E1AE1CF}.Debug|x86.Build.0 = Debug|Win32
+		{BD6D56C2-3E45-4479-95F8-7CE08E1AE1CF}.Release|Any CPU.ActiveCfg = Release|Win32
+		{BD6D56C2-3E45-4479-95F8-7CE08E1AE1CF}.Release|x64.ActiveCfg = Release|x64
+		{BD6D56C2-3E45-4479-95F8-7CE08E1AE1CF}.Release|x64.Build.0 = Release|x64
+		{BD6D56C2-3E45-4479-95F8-7CE08E1AE1CF}.Release|x86.ActiveCfg = Release|Win32
+		{BD6D56C2-3E45-4479-95F8-7CE08E1AE1CF}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
