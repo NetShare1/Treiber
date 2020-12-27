@@ -9,14 +9,14 @@
 #include "minitrace.h"
 
 static DWORD WINAPI
-ReceivePackets(_Inout_ Config conf)
+ReceivePackets(_Inout_ std::shared_ptr<Config> conf)
 {
     MTR_META_THREAD_NAME("Wintun Receive Thread");
-    WINTUN_SESSION_HANDLE Session = conf.sessionHandle;
-    HANDLE WaitHandles[] = { WintunGetReadWaitEvent(Session), conf.quitEvent };
+    WINTUN_SESSION_HANDLE Session = conf->sessionHandle;
+    HANDLE WaitHandles[] = { WintunGetReadWaitEvent(Session), conf->quitEvent };
     int runFor = 11;
     try {
-        while (conf.isRunning)
+        while (conf->isRunning)
         {
             runFor--;
             DWORD PacketSize;
@@ -34,9 +34,9 @@ ReceivePackets(_Inout_ Config conf)
                 BYTE* internalPacket = new BYTE[PacketSize];
                 std::copy(Packet, Packet + PacketSize, internalPacket);
 
-                conf.sendingPacketQueue->push(new WorkPacket(internalPacket, PacketSize));
+                conf->sendingPacketQueue->push(new WorkPacket(internalPacket, PacketSize));
 
-                conf.stats.tunPacketRecieved();
+                conf->stats.tunPacketRecieved();
 
                 WintunReleaseReceivePacket(Session, Packet);
             }
@@ -68,29 +68,31 @@ ReceivePackets(_Inout_ Config conf)
         LogError(L"An Error accoured in the WinTun Driver code: ", (DWORD)e.what());
         return 23512;
     }
+
+    Log(WINTUN_LOG_INFO, L"Wintun Receiving Worker shutdown");
     return ERROR_SUCCESS;
 }
 
 
 static DWORD WINAPI
-SendPackets(_Inout_ Config conf)
+SendPackets(_Inout_ std::shared_ptr<Config> conf)
 {
     MTR_META_THREAD_NAME("Wintun Send Thread");
-    WINTUN_SESSION_HANDLE Session = conf.sessionHandle;
-    HANDLE WaitHandles[] = { conf.quitEvent };
+    WINTUN_SESSION_HANDLE Session = conf->sessionHandle;
+    HANDLE WaitHandles[] = { conf->quitEvent };
 
     try {
-        while (conf.isRunning)
+        while (conf->isRunning)
         {
             size_t size;
-            WorkPacket** internalPacket = conf.recievingPacketQueue->popAll(&size);
+            WorkPacket** internalPacket = conf->recievingPacketQueue->popAll(&size);
             for (size_t i = 0; i < size; i++) {
                 MTR_SCOPE("Wintun_send", "Sending multible packets");
-                if (!conf.isRunning) {
+                if (!conf->isRunning) {
                     return ERROR_SUCCESS;
                 }
 
-                BYTE* sendingPacket = WintunAllocateSendPacket(conf.sessionHandle, internalPacket[i]->packetSize);
+                BYTE* sendingPacket = WintunAllocateSendPacket(conf->sessionHandle, internalPacket[i]->packetSize);
             
                 if (sendingPacket) {
                     MTR_SCOPE("Wintun_send", "Sending Packet");
@@ -100,13 +102,13 @@ SendPackets(_Inout_ Config conf)
                         sendingPacket
                     );
 
-                    WintunSendPacket(conf.sessionHandle, sendingPacket);
+                    WintunSendPacket(conf->sessionHandle, sendingPacket);
                     DLOG(
                         WINTUN_LOG_INFO,
                         L"[-2] Sending Packet on WintunAdpater with length %d",
                         internalPacket[i]->packetSize
                     );
-                    conf.stats.tunPacketSent();
+                    conf->stats.tunPacketSent();
                 }
                 else if (GetLastError() != ERROR_BUFFER_OVERFLOW)
                     return LogLastError(L"[-2] Packet write failed");
@@ -118,5 +120,6 @@ SendPackets(_Inout_ Config conf)
         LogError(L"An Error accoured in the WinTun Driver code: ", (DWORD)e.what());
         return 23512;
     }
+    Log(WINTUN_LOG_INFO, L"Wintun Sending Worker shutdown");
     return ERROR_SUCCESS;
 }

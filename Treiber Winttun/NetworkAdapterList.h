@@ -90,19 +90,19 @@ public:
 		}
 	}
 
-	std::vector<UDPWorkerConfig*>* generateUDPConfigs(Config* conf) {
+	std::vector<std::shared_ptr<UDPWorkerConfig>>* generateUDPConfigs(std::shared_ptr<Config> conf) {
 		MTR_SCOPE("Network_Adapter_List", __FUNCSIG__);
 		int port = 65530;
 		int uid = 0;
-		std::vector<UDPWorkerConfig*>* configs = new std::vector<UDPWorkerConfig*>();
+		std::vector<std::shared_ptr<UDPWorkerConfig>>* configs = new std::vector<std::shared_ptr<UDPWorkerConfig>>();
 		for (
 			std::vector<std::pair<bool, NetworkAdapter*>*>::iterator it = adapterList->begin();
 			it != adapterList->end();
 			++it)
 		{
 			if ((*it)->first) {
-				UDPWorkerConfig* sconf = new UDPWorkerConfig();
-				UDPWorkerConfig* rconf = new UDPWorkerConfig();
+				std::shared_ptr<UDPWorkerConfig> sconf{ new UDPWorkerConfig() };
+				std::shared_ptr<UDPWorkerConfig> rconf{ new UDPWorkerConfig() };
 
 				sconf->conf = conf;
 				rconf->conf = conf;
@@ -121,7 +121,7 @@ public:
 				rconf->uid = uid;
 				uid++;
 
-				initSocket(*sconf);
+				initSocket(sconf);
 				rconf->socket = sconf->socket;
 
 				configs->push_back(sconf);

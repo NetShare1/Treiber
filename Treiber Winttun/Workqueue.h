@@ -18,7 +18,6 @@ public:
 	}
 
 	~Workqueue() {
-		Log(WINTUN_LOG_WARN, L"Deleting");
 		releaseAll();
 	}
 
@@ -30,7 +29,10 @@ public:
 	WorkPacket** popAll(_Out_ size_t* size);
 
 	void releaseAll() {
-		//hasPackets.notify_all();
+		std::lock_guard<std::mutex> lock{ m };
+		for (int i = 0; i < 10; i++) {
+			hasPackets.notify_all();
+		}
 		released = true;
 	}
 

@@ -26,86 +26,74 @@ class Statistics {
 public:
 
     Statistics() {
-#ifdef NS_ENABLE_STATISTICS
         statsCalcuatorThread = new std::thread([this]() {
             MTR_META_THREAD_NAME("Statistics Calculator Thread");
             this->calculateStats();
         });
-#endif
     }
 
     ~Statistics() {
+        shutdown();
+    }
 
-#ifdef NS_ENABLE_STATISTICS
-        exitSignal.set_value();
-        statsCalcuatorThread->join();
-        delete statsCalcuatorThread;
-#endif
+    void shutdown() {
+        std::lock_guard<std::mutex> lck{ m };
+        if (isRunning) {
+            Log(WINTUN_LOG_INFO, L"Shutting down Statistics");
+            exitSignal.set_value();
+            statsCalcuatorThread->join();
+            delete statsCalcuatorThread;
+            isRunning = false;
+        }
     }
 
     void tunPacketSent() {
         MTR_SCOPE("Statistics", __FUNCSIG__);
-#ifdef NS_ENABLE_STATISTICS
         std::lock_guard<std::mutex> lck{ m };
         tunPacketsSent++;
-#endif // NS_ENABLE_STATISTICS
     }
 
     void tunPacketRecieved() {
         MTR_SCOPE("Statistics", __FUNCSIG__);
-#ifdef NS_ENABLE_STATISTICS
         std::lock_guard<std::mutex> lck{ m };
         tunPacketsRecieved++;
-#endif // NS_ENABLE_STATISTICS
     }
 
     int getTunPacketsSent() {
         MTR_SCOPE("Statistics", __FUNCSIG__);
-#ifdef NS_ENABLE_STATISTICS
         std::lock_guard<std::mutex> lck{ m };
-#endif
         return tunPacketsSent;
     }
 
     int getTunPacketsRecieved() {
         MTR_SCOPE("Statistics", __FUNCSIG__);
-#ifdef NS_ENABLE_STATISTICS
         std::lock_guard<std::mutex> lck{ m };
-#endif
         return tunPacketsRecieved;
     }
 
     void udpPacketSent(int bits) {
         MTR_SCOPE("Statistics", __FUNCSIG__);
-#ifdef NS_ENABLE_STATISTICS
         std::lock_guard<std::mutex> lck{ m };
         bitsSentCurrentSecond += bits;
         udpPacketsSent++;
-#endif // NS_ENABLE_STATISTICS
     }
 
     void udpPacketRecieved(int bits) {
         MTR_SCOPE("Statistics", __FUNCSIG__);
-#ifdef NS_ENABLE_STATISTICS
         std::lock_guard<std::mutex> lck{ m };
         udpPacketsRecieved++;
         bitsRecievedCurrentSecond += bits;
-#endif // NS_ENABLE_STATISTICS
     }
 
     int getUdpPacketsSent() {
         MTR_SCOPE("Statistics", __FUNCSIG__);
-#ifdef NS_ENABLE_STATISTICS
         std::lock_guard<std::mutex> lck{ m };
-#endif
         return udpPacketsSent;
     }
 
     int getUdpPacketsRecieved() {
         MTR_SCOPE("Statistics", __FUNCSIG__);
-#ifdef NS_ENABLE_STATISTICS
         std::lock_guard<std::mutex> lck{ m };
-#endif
         return udpPacketsRecieved;
     }
 
@@ -149,6 +137,7 @@ private:
 
     std::thread* statsCalcuatorThread;
     std::promise<void> exitSignal;
+    bool isRunning = true;
     std::future<void> futureObj = exitSignal.get_future();
 
     long long tunPacketsRecieved = 0;

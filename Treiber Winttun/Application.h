@@ -66,16 +66,16 @@ private:
 	void initProfiling();
 	void shutdownProfiling();
 
-	Config* createConfigFromFile(std::string file);
-	void addConfParameter(std::string keyValue, _Inout_ Config* conf);
+	std::shared_ptr<Config> createConfigFromFile(std::string file);
+	void addConfParameter(std::string keyValue, _Inout_ std::shared_ptr<Config> conf);
 
 	void clearWorkers();
 
-	Config* conf;
+	std::shared_ptr<Config> conf;
 	NetworkAdapterList* adapterList;
 
-	std::vector<std::string>* adapterNames = new std::vector<std::string>();
-	std::vector<UDPWorkerConfig*>* udpconfigs;
+	std::unique_ptr<std::vector<std::string>> adapterNames;
+	std::vector<std::shared_ptr<UDPWorkerConfig>>* udpconfigs;
 
 	int numberOfWorkers;
 	HANDLE* Workers;
@@ -86,9 +86,6 @@ private:
 
 	bool exited = true;
 	bool startingUp = false;
-
-
-	
 
 #ifdef NS_PERF_PROFILE
 	std::thread* metricsThread;

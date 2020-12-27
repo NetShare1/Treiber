@@ -54,20 +54,17 @@ class Config
 {
 public:
 	Config() {
-		this->sendingPacketQueue = new Workqueue(NS_QUEUE_SIZE);
-		this->recievingPacketQueue = new Workqueue(NS_QUEUE_SIZE);
+		sendingPacketQueue.reset(new Workqueue(NS_QUEUE_SIZE));
+		recievingPacketQueue.reset(new Workqueue(NS_QUEUE_SIZE));
 	}
 
-	~Config() {
-		delete sendingPacketQueue;
-		delete recievingPacketQueue;
-	}
+	~Config() {}
 
 	WINTUN_ADAPTER_HANDLE adapterHandle;
 	WINTUN_SESSION_HANDLE sessionHandle;
 
-	Workqueue* sendingPacketQueue;
-	Workqueue* recievingPacketQueue;
+	std::unique_ptr<Workqueue> sendingPacketQueue;
+	std::unique_ptr<Workqueue> recievingPacketQueue;
 
 	NsIpAddress winTunAdapterIpv4Adress;
 	

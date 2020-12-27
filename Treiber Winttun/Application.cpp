@@ -12,11 +12,11 @@ void Application::run()
     Workers = new HANDLE[numberOfWorkers]();
 
 
-    Workers[0] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ReceivePackets, (LPVOID)conf, 0, NULL);
-    Workers[1] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)SendPackets, (LPVOID)conf, 0, NULL);
+    Workers[0] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ReceivePackets, (LPVOID)&conf, 0, NULL);
+    Workers[1] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)SendPackets, (LPVOID)&conf, 0, NULL);
     for (int i = 2; i < numberOfWorkers; i++) {
         DLOG(WINTUN_LOG_INFO, L"Starting Thread %d", i);
-        Workers[i] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)WorkSocket, (LPVOID)udpconfigs->at(i - 2), 0, NULL);
+        Workers[i] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)WorkSocket, (LPVOID)&udpconfigs->at(i - 2), 0, NULL);
     }
 
     // route delete 0.0.0.0
@@ -51,6 +51,8 @@ bool Application::initRun()
 
     exited = false;
     startingUp = true;
+
+    adapterNames.reset(new std::vector<std::string>());
 
     conf = createConfigFromFile(confFilePath);
 
@@ -122,14 +124,15 @@ void Application::shutdown()
     if (exited) {
         return;
     }
-    exited = true;
-    Log(WINTUN_LOG_INFO, L"Shutting down");
-    conf->isRunning = false;
-    SetEvent(conf->quitEvent);
     Log(WINTUN_LOG_INFO, L"Messages Recieved on tun device: %d", conf->stats.getTunPacketsRecieved());
     Log(WINTUN_LOG_INFO, L"Messages Sent on tun device: %d", conf->stats.getTunPacketsSent());
     Log(WINTUN_LOG_INFO, L"Messages Recieved on udp sockets: %d", conf->stats.getUdpPacketsRecieved());
     Log(WINTUN_LOG_INFO, L"Messages Sent on udp sockets: %d", conf->stats.getUdpPacketsSent());
+    conf->stats.shutdown();
+    exited = true;
+    Log(WINTUN_LOG_INFO, L"Shutting down");
+    conf->isRunning = false;
+    SetEvent(conf->quitEvent);
 
     conf->sendingPacketQueue->releaseAll();
     conf->recievingPacketQueue->releaseAll();
@@ -156,9 +159,9 @@ void Application::shutdown()
     shutdownProfiling();
     Log(WINTUN_LOG_INFO, L"Shutdown successful");
 
-    delete conf;
-    delete[] adapterNames;
-    delete[] udpconfigs;
+    conf = nullptr;
+    adapterNames = nullptr;
+    delete udpconfigs;
 }
 
 void Application::init(std::string confFilePath)
@@ -196,9 +199,9 @@ void Application::shutdownProfiling()
     mtr_shutdown();
 }
 
-Config* Application::createConfigFromFile(std::string file)
+std::shared_ptr<Config> Application::createConfigFromFile(std::string file)
 {
-    Config* conf = new Config();
+    std::shared_ptr<Config> conf{new Config()};
     std::string line;
     std::ifstream infile(file);
     while (std::getline(infile, line))
@@ -208,7 +211,7 @@ Config* Application::createConfigFromFile(std::string file)
     return conf;
 }
 
-void Application::addConfParameter(std::string value, Config* conf)
+void Application::addConfParameter(std::string value, _Inout_ std::shared_ptr<Config> conf)
 {
     // remove all whitespace left and right
     trim(value);
@@ -258,8 +261,7 @@ void Application::clearWorkers()
     {
         if (Workers[i])
         {
-            // Wait 5 seconds before forcefully shutting down threads
-            WaitForSingleObject(Workers[i], 5000);
+            WaitForSingleObject(Workers[i], INFINITE);
             CloseHandle(Workers[i]);
             DLOG(
                 WINTUN_LOG_INFO,

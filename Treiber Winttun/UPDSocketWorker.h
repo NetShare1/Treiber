@@ -6,10 +6,10 @@
 #include "diagnostics.h"
 
 
-int initSocket(UDPWorkerConfig& conf);
+int initSocket(std::shared_ptr<UDPWorkerConfig> conf);
 
-void closeSockets(std::vector<UDPWorkerConfig*>* configs);
+void closeSockets(std::vector<std::shared_ptr<UDPWorkerConfig>>* configs);
 
 void shutdownWSA();
 
-int WorkSocket(UDPWorkerConfig& conf);
+int WorkSocket(std::shared_ptr<UDPWorkerConfig> conf);

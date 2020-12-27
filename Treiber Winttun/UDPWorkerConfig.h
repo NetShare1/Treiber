@@ -4,7 +4,7 @@
 
 class UDPWorkerConfig {
 public: 
-	Config* conf;
+	std::shared_ptr<Config> conf;
 
 	NsIpAddress socketIpv4Adress;
 	uint16_t socketPort;

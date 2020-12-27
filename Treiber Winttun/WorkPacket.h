@@ -14,10 +14,11 @@ public:
 	WorkPacket() {};
 
 	~WorkPacket() {
+		delete[] packet;
 	}
 
 	BYTE* packet;
 	DWORD packetSize;
-
+	bool sent = false;
 };
 

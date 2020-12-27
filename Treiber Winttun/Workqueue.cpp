@@ -14,7 +14,6 @@ void Workqueue::push(WorkPacket* workPacket) {
     // if the last packet is on the end of the buffer
     if (!ableToInputPacket()) {
         Log(WINTUN_LOG_WARN, L"[WORKQUEUE]: Buffer full dropping packet");
-        delete[] workPacket->packet;
         delete workPacket;
         return;
     }
@@ -38,6 +37,7 @@ WorkPacket* Workqueue::pop() {
 
 WorkPacket** Workqueue::popSize(_In_ size_t size, _Out_ size_t* actualSize) {
     MTR_SCOPE("Workqueue", "Removing multible Packets");
+    if (released) return nullptr;
     std::unique_lock<std::mutex> ulock{ m };
     // Wait until there is something in the queue
     hasPackets.wait(ulock, [this] {return !empty() || released; });
@@ -73,9 +73,14 @@ WorkPacket** Workqueue::popSize(_In_ size_t size, _Out_ size_t* actualSize) {
 
 WorkPacket** Workqueue::popAll(_Out_ size_t* size) {
     MTR_SCOPE("Workqueue", "Removing all Packets");
+    if (released) return nullptr;
     std::unique_lock<std::mutex> ulock{ m };
     // Wait until there is something in the queue
     hasPackets.wait(ulock, [this] {return !empty() || released; });
+    if (released) {
+        *size = 0;
+        return nullptr;
+    }
     
     *size = this->size;
     WorkPacket** list = new WorkPacket * [*size]();
