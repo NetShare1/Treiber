@@ -1,0 +1,3 @@
+[submodule "Treiber Winttun/lib/rapidjson"]
+	path = Treiber Winttun/lib/rapidjson
+	url = https://github.com/Tencent/rapidjson.git
