@@ -3,6 +3,10 @@
 #include "log.h"
 #include "diagnostics.h"
 
+#include "rapidjson/document.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 int runConfigurationWorker()
 {
 	SocketServer in(5260, 3);
@@ -24,19 +28,9 @@ unsigned __stdcall Answer(void* a) {
 
     Log(WINTUN_LOG_INFO, L"New configuration connection established");
 
-    while (1) {
-        std::string r = s->ReceiveLine();
-        if (r.empty()) break;
-        DLOG(WINTUN_LOG_INFO, L"New message recieved: %S", r.c_str());
-        r.erase(std::remove(r.begin(), r.end(), '\n'), r.end());
-        if (r == "connection.set.closed") {
-            s->SendLine("connection.state.closed");
-            break;
-        }
-        else if (r.substr(0, 7) == "driver.") {
-            parseDriverAction(r.substr(7, r.size()), s);
-        }
-    }
+    ConfigurationWorker worker{ s };
+
+    worker.run();
 
     delete s;
 
@@ -47,6 +41,9 @@ void parseDriverAction(std::string command, Socket* socket)
 {
     if (command.substr(0, 4) == "set.") {
         return parseDriverSetAction(command.substr(4, command.size()), socket);
+    }
+    else if (command.substr(0, 4) == "get.") {
+        return parseDriverGetAction(command.substr(4, command.size()), socket);
     }
 }
 
@@ -105,6 +102,78 @@ void parseDriverSetAction(std::string command, Socket* socket)
                 socket->SendLine("driver.state.state.stopped");
                 return;
             }
+        }
+    }
+}
+
+
+
+void parseDriverGetAction(std::string command, Socket* socket) {
+    if (command.substr(0, 5) == "state") {
+        Application* app = Application::Get();
+        if (app->isStartingUp()) {
+            socket->SendLine("driver.state.state.startup");
+            return;
+        }
+        else if (app->isRunning()) {
+            socket->SendLine("driver.state.state.running");
+            return;
+        }
+        else {
+            socket->SendLine("driver.state.state.stopped");
+            return;
+        }
+    }
+    else if (command.substr(0, 5) == "names") {
+        Application* app = Application::Get();
+    }
+}
+
+ConfigurationWorker::ConfigurationWorker(Socket* asocket)
+    : socket{ asocket }
+{
+    app = Application::Get();
+    Log(WINTUN_LOG_INFO, L"New configuration connection established");
+}
+
+
+void ConfigurationWorker::parseMessage(std::string request)
+{
+    rapidjson::Document requestDocument;
+
+    if (requestDocument.Parse(request.c_str()).HasParseError()) {
+        rapidjson::StringBuffer s;
+        rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+
+        writer.StartObject();
+        writer.Key("type");
+        writer.String("Response");
+        writer.Key("data");
+        writer.StartObject();
+        writer.Key("error");
+        writer.String("You have passed an invalid json document!");
+        writer.EndObject();
+        writer.EndObject();
+
+        socket->SendLine(s.GetString());
+        return;
+    }
+
+}
+
+void ConfigurationWorker::run()
+{
+    while (running) {
+        std::string r = socket->ReceiveLine();
+        if (r.empty()) break;
+        DLOG(WINTUN_LOG_INFO, L"New message recieved: %S", r.c_str());
+        r.erase(std::remove(r.begin(), r.end(), '\n'), r.end());
+        if (r == "connection.set.closed") {
+            socket->SendLine("connection.state.closed");
+            break;
+        }
+        else if (r.substr(0, 7) == "driver.") {
+            parseDriverAction(r.substr(7, r.size()), socket);
         }
     }
 }

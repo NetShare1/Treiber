@@ -120,6 +120,9 @@
     <ClInclude Include="ConfigurationWorker.h">
       <Filter>Header Files\ConfigurationSocket</Filter>
     </ClInclude>
+    <ClInclude Include="AppConfig.h">
+      <Filter>Header Files\Config</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -154,6 +157,9 @@
     </ClCompile>
     <ClCompile Include="ConfigurationWorker.cpp">
       <Filter>Source Files\ConfigurationSocket</Filter>
+    </ClCompile>
+    <ClCompile Include="AppConfig.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

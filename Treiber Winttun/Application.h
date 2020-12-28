@@ -17,6 +17,7 @@
 #include "minitrace.h"
 #include "utils.h"
 #include "ConfigurationWorker.h"
+#include "AppConfig.h"
 
 #include <combaseapi.h>
 #include <synchapi.h>
@@ -46,6 +47,10 @@ public:
 		return startingUp;
 	}
 
+	std::shared_ptr<Config> getConfig() {
+		return conf;
+	}
+
 	static Application* Get() {
 		static std::mutex m;
 		static Application* instance;
@@ -72,6 +77,8 @@ private:
 	void clearWorkers();
 
 	std::shared_ptr<Config> conf;
+	std::shared_ptr<Config> wintunReceiveConf;
+	std::shared_ptr<Config> wintunSendConf;
 	NetworkAdapterList* adapterList;
 
 	std::unique_ptr<std::vector<std::string>> adapterNames;
@@ -81,6 +88,8 @@ private:
 	HANDLE* Workers;
 
 	std::thread* configThread;
+
+	std::unique_ptr<AppConfig> internalConfig = std::make_unique<AppConfig>();
 
 	std::string confFilePath;
 

@@ -9,6 +9,7 @@
 #include "diagnostics.h"
 
 #include <stdint.h>
+#include <fstream>
 
 // Max size of udp datagram
 #define NS_RECIEVE_BUFFER_SIZE WINTUN_MAX_IP_PACKET_SIZE
@@ -47,6 +48,20 @@ public:
 				(lhs.ipp4 == rhs.ipp4)
 			)
 			;
+	}
+
+	void write(std::ofstream& f) {
+		f.write((char*)&ipp1, sizeof(ipp1));
+		f.write((char*)&ipp2, sizeof(ipp2));
+		f.write((char*)&ipp3, sizeof(ipp3));
+		f.write((char*)&ipp4, sizeof(ipp4));
+	}
+
+	void read(std::ifstream& f) {
+		f.read((char*)&ipp1, sizeof(ipp1));
+		f.read((char*)&ipp2, sizeof(ipp2));
+		f.read((char*)&ipp3, sizeof(ipp3));
+		f.read((char*)&ipp4, sizeof(ipp4));
 	}
 };
 

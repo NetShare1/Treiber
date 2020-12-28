@@ -11,9 +11,11 @@ void Application::run()
 
     Workers = new HANDLE[numberOfWorkers]();
 
+    wintunReceiveConf = conf;
+    wintunSendConf = conf;
 
-    Workers[0] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ReceivePackets, (LPVOID)&conf, 0, NULL);
-    Workers[1] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)SendPackets, (LPVOID)&conf, 0, NULL);
+    Workers[0] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ReceivePackets, (LPVOID)&wintunReceiveConf, 0, NULL);
+    Workers[1] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)SendPackets, (LPVOID)&wintunSendConf, 0, NULL);
     for (int i = 2; i < numberOfWorkers; i++) {
         DLOG(WINTUN_LOG_INFO, L"Starting Thread %d", i);
         Workers[i] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)WorkSocket, (LPVOID)&udpconfigs->at(i - 2), 0, NULL);
@@ -52,9 +54,51 @@ bool Application::initRun()
     exited = false;
     startingUp = true;
 
-    adapterNames.reset(new std::vector<std::string>());
 
-    conf = createConfigFromFile(confFilePath);
+    // conf = createConfigFromFile(confFilePath);
+    std::ifstream file(confFilePath, std::ios::in | std::ios::binary);
+    if (!file.is_open()) {
+        std::ofstream outFile(confFilePath, std::ios::out | std::ios::binary);
+        Log(WINTUN_LOG_WARN, L"File does not exist creating default one");
+        internalConfig->adapterIp.ipp1 = 10;
+        internalConfig->adapterIp.ipp2 = 0;
+        internalConfig->adapterIp.ipp3 = 0;
+        internalConfig->adapterIp.ipp4 = 3;
+        internalConfig->adapterSubnetBits = 24;
+
+        internalConfig->serverIp.ipp1 = 178;
+        internalConfig->serverIp.ipp2 = 63;
+        internalConfig->serverIp.ipp3 = 3;
+        internalConfig->serverIp.ipp4 = 159;
+        internalConfig->serverPort = 5555;
+
+        internalConfig->names->push_back("{C4501663-4776-442F-86BD-8373C8583219}");
+        internalConfig->names->push_back("{C9C041C1-2F18-49BD-A8EF-5CC7BE5D4F63}");
+        internalConfig->names->push_back("{BF52BB84-63C6-493C-9FB3-82A5917D3521}");
+        internalConfig->names->push_back("{B6BBCC6F-E3F6-47AF-8869-B52D441F9AE8}");
+        internalConfig->names->push_back("{251C104E-9987-4CB5-986F-C2CE287B4429}");
+
+        internalConfig->write(outFile);
+        outFile.close();
+    }
+    try {
+        internalConfig->read(file);
+    }
+    catch (...) {
+        Log(WINTUN_LOG_ERR, L"Error reading config file");
+        return false;
+    }
+    file.close();
+
+    adapterNames.reset(internalConfig->names);
+
+    conf.reset(new Config());
+
+    conf->serverIpv4Adress = internalConfig->serverIp;
+    conf->serverPort = internalConfig->serverPort;
+
+    conf->winTunAdapterIpv4Adress = internalConfig->adapterIp;
+    conf->winTunAdapterSubnetBits = internalConfig->adapterSubnetBits;
 
     HMODULE Wintun = InitializeWintun();
     if (!Wintun) {
@@ -160,7 +204,8 @@ void Application::shutdown()
     Log(WINTUN_LOG_INFO, L"Shutdown successful");
 
     conf = nullptr;
-    adapterNames = nullptr;
+    wintunReceiveConf = nullptr;
+    wintunSendConf = nullptr;
     delete udpconfigs;
 }
 

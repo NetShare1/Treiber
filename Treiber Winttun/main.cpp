@@ -6,5 +6,5 @@ int main() {
 
     Application* instance = Application::Get();
 
-    instance->init("conf.conf");
+    instance->init("conf.nsconf");
 }
