@@ -7,12 +7,17 @@
 
 #include "CLI11.hpp"
 
+#include "rapidjson/document.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 
 void startDriver(int listenPort);
 void stopDriver(int listenPort);
 void configureDriver();
 void printDriver();
-
+std::string generateGetRequest(std::string on);
+std::string getStopConnectionRequest();
 
 
 int main(int argc, char* argv[])
@@ -74,25 +79,65 @@ void startDriver(int listenPort) {
     try {
         SocketClient s("localhost", listenPort);
 
-        s.SendLine("driver.set.state.running\n");
+        rapidjson::StringBuffer sb;
+        rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+
+        writer.StartObject();
+        writer.Key("type");
+        writer.String("Put");
+        writer.Key("on");
+        writer.String("driver.state");
+        writer.Key("data");
+        writer.StartObject();
+        writer.Key("state");
+        writer.String("running");
+        writer.EndObject();
+        writer.EndObject();
+
+        std::string request = sb.GetString();
+
+        s.SendLine(request);
 
         std::string l = "";
-        while (l != "connection.state.closed") {
+        while (true) {
             l = s.ReceiveLine();
+            rapidjson::Document resDoc;
+            if (resDoc.Parse(l.c_str()).HasParseError()) break;
             if (l.empty()) {
                 break;
             }
-            l.erase(std::remove(l.begin(), l.end(), '\n'), l.end());
-            if (l == "driver.state.state.startup") {
-                std::cout << "VPN Woker is starting up ..." << std::endl;
+
+            if (!resDoc.HasMember("type")) {
+                continue;
             }
-            else if (l == "driver.state.state.running") {
-                std::cout << "VPN Worker is running!" << std::endl;
-                s.SendLine("connection.set.closed");
+
+            if (!resDoc["type"].IsString()) {
+                continue;
             }
-            else if (l == "driver.state.state.crashed") {
-                std::cerr << "VPN Woker crashed during startup. Please check the logs for more info" << std::endl;
-                s.SendLine("connection.set.closed");
+
+            if (!resDoc.HasMember("state")) {
+                continue;
+            }
+
+            if (!resDoc["state"].IsString()) {
+                continue;
+            }
+
+            std::string type = resDoc["type"].GetString();
+            std::string state = resDoc["state"].GetString();
+
+            if (state.compare("running") == 0) {
+                std::cout << "VPN Worker is running" << std::endl;
+            }
+            else if (state.compare("startup") == 0) {
+                std::cout << "VPN Worker is starting up" << std::endl;
+            }
+            else if (state.compare("crashed") == 0) {
+                std::cout << "VPN Worker has crashed during startup please view the logs for more info" << std::endl;
+            }
+
+            if (type.compare("Response") == 0) {
+                return s.SendLine(getStopConnectionRequest());
             }
         }
     }
@@ -170,4 +215,37 @@ void printDriver() {
 
 void getSocket() {
 
+}
+
+std::string generateGetRequest(std::string on) {
+    rapidjson::StringBuffer s;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+
+    writer.StartObject();
+    writer.Key("type");
+    writer.String("Get");
+    writer.Key("on");
+    writer.String(on.c_str());
+    writer.EndObject();
+
+    return s.GetString();
+}
+
+std::string getStopConnectionRequest() {
+    rapidjson::StringBuffer s;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+
+    writer.StartObject();
+    writer.Key("type");
+    writer.String("Put");
+    writer.Key("on");
+    writer.String("connection.state");
+    writer.Key("data");
+    writer.StartObject();
+    writer.Key("state");
+    writer.String("closed");
+    writer.EndObject();
+    writer.EndObject();
+
+    return s.GetString();
 }

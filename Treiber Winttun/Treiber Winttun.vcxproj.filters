@@ -61,6 +61,9 @@
     <Filter Include="Source Files\ConfigurationSocket">
       <UniqueIdentifier>{8366dd9c-1677-4a07-81df-c9023af99c71}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Config">
+      <UniqueIdentifier>{c9a8f407-f69c-4737-8c9c-c1642c7efac9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Config.h">
@@ -159,7 +162,7 @@
       <Filter>Source Files\ConfigurationSocket</Filter>
     </ClCompile>
     <ClCompile Include="AppConfig.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Config</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

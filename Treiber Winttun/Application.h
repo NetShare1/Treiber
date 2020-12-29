@@ -32,7 +32,6 @@
 class Application
 {
 public:
-
 	void run();
 	bool initRun();
 	void shutdown();

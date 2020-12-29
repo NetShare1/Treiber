@@ -2,6 +2,7 @@
 
 #include "log.h"
 #include "diagnostics.h"
+#include "Application.h"
 
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
@@ -132,7 +133,6 @@ void parseDriverGetAction(std::string command, Socket* socket) {
 ConfigurationWorker::ConfigurationWorker(Socket* asocket)
     : socket{ asocket }
 {
-    app = Application::Get();
     Log(WINTUN_LOG_INFO, L"New configuration connection established");
 }
 
@@ -142,23 +142,169 @@ void ConfigurationWorker::parseMessage(std::string request)
     rapidjson::Document requestDocument;
 
     if (requestDocument.Parse(request.c_str()).HasParseError()) {
-        rapidjson::StringBuffer s;
-        rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+        socket->SendLine(getErrorResponse("Invalid JSON. You need to provide a vaild JSON document!"));
+        return;
+    }
+    else if (requestDocument.HasMember("type")) {
+        if (requestDocument["type"].IsString()) {
+            std::string type = requestDocument["type"].GetString();
+            if (type.compare("Get") == 0) {
+            
+            }
+            else if (type.compare("Put") == 0) {
+                return parsePutMessage(requestDocument);
+            }
+            else if (type.compare("Delete") == 0) {
+            
+            }
+            else {
+                socket->SendLine(getErrorResponse("Member \"type\" needs to be one of [\"Get\", \"Put\", \"Delete\"]"));
+            }
+        }
+        else {
+            socket->SendLine(getErrorResponse("Member \"type\" needs to be a string"));
+        }
+    }
+    else {
+        socket->SendLine(getErrorResponse("No member \"type\" found. Please provide one"));
+    }
+}
 
-        writer.StartObject();
-        writer.Key("type");
-        writer.String("Response");
-        writer.Key("data");
-        writer.StartObject();
-        writer.Key("error");
-        writer.String("You have passed an invalid json document!");
-        writer.EndObject();
-        writer.EndObject();
+void ConfigurationWorker::parsePutMessage(rapidjson::Document& doc)
+{
+    if (doc.HasMember("on")) {
+        if (doc["on"].IsString()) {
+            std::string on = doc["on"].GetString();
 
-        socket->SendLine(s.GetString());
+            if (on.compare("driver.state") == 0) {
+                return parseDriverStatePutMessage(doc);
+            }
+            else {
+                socket->SendLine(getErrorResponse("Unknown ressource of \"on\""));
+            }
+        }
+        else {
+            socket->SendLine(getErrorResponse("Member \"on\" needs to be a string"));
+            return;
+        }
+    }
+    else {
+        socket->SendLine(getErrorResponse("No member \"on\" provided."));
+    }
+}
+
+std::string ConfigurationWorker::getErrorResponse(std::string errorMessage)
+{
+    rapidjson::StringBuffer s;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+
+    writer.StartObject();
+    writer.Key("type");
+    writer.String("Response");
+    writer.Key("data");
+    writer.StartObject();
+    writer.Key("error");
+    writer.String(errorMessage.c_str());
+    writer.EndObject();
+    writer.EndObject();
+
+    return s.GetString();
+}
+
+void ConfigurationWorker::parseDriverStatePutMessage(rapidjson::Document& doc)
+{
+    if (!doc.HasMember("data")) {
+        socket->SendLine(getErrorResponse("The Put request needs a \"type\" member"));
         return;
     }
 
+    if (!doc["data"].IsObject()) {
+        socket->SendLine(getErrorResponse("Member \"data\" needs to be an object"));
+        return;
+    }
+
+    rapidjson::Value& data = doc["data"];
+    if (!data.HasMember("state")) {
+        socket->SendLine(getErrorResponse("Member \"data\" needs to have a member \"state\""));
+        return;
+    }
+
+    if (!data["state"].IsString()) {
+        socket->SendLine(getErrorResponse("Member \"data.state\" needs to be a string"));
+        return;
+    }
+
+    std::string state = data["state"].GetString();
+
+    if (state.compare("running") == 0) {
+        Application* app = Application::Get();
+
+        if (app->isStartingUp()) {
+            socket->SendLine(getDriverStateUpdate("startup"));
+            return;
+        }
+
+        if (app->isRunning()) {
+            socket->SendLine(getDriverStateUpdate("running"));
+            return;
+        }
+
+        socket->SendLine(getDriverStateUpdate("startup"));
+        if (app->initRun()) {
+            app->run();
+            socket->SendLine(getDriverStateUpdate("running"));
+        }
+        else {
+            socket->SendLine(getDriverStateUpdate("crashed"));
+        }
+    }
+    else if (state.compare("stopped") == 0) {
+        Application* app = Application::Get();
+
+        if (app->isStartingUp()) {
+            socket->SendLine(getDriverStateUpdate("startup"));
+            return;
+        }
+
+        if (app->isRunning()) {
+            socket->SendLine(getDriverStateUpdate("running"));
+        }
+        else {
+            socket->SendLine(getDriverStateUpdate("stopped"));
+            return;
+        }
+
+
+        app->shutdown();
+
+        if (app->isRunning()) {
+            socket->SendLine(getDriverStateUpdate("running"));
+            return;
+        }
+        else {
+            socket->SendLine(getDriverStateUpdate("stopped"));
+            return;
+        }
+    }
+    else {
+        socket->SendLine(getErrorResponse("Member \"data.state\" needs to be ether \"running\" or \"stopped\""));
+        return;
+    }
+}
+
+std::string ConfigurationWorker::getDriverStateUpdate(std::string state)
+{
+    rapidjson::StringBuffer s;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+
+    writer.StartObject();
+    writer.Key("type");
+    writer.String("Update");
+    writer.Key("state");
+    writer.String(state.c_str());
+    writer.EndObject();
+
+    return s.GetString();
 }
 
 void ConfigurationWorker::run()
@@ -167,13 +313,6 @@ void ConfigurationWorker::run()
         std::string r = socket->ReceiveLine();
         if (r.empty()) break;
         DLOG(WINTUN_LOG_INFO, L"New message recieved: %S", r.c_str());
-        r.erase(std::remove(r.begin(), r.end(), '\n'), r.end());
-        if (r == "connection.set.closed") {
-            socket->SendLine("connection.state.closed");
-            break;
-        }
-        else if (r.substr(0, 7) == "driver.") {
-            parseDriverAction(r.substr(7, r.size()), socket);
-        }
+        parseMessage(r);
     }
 }

@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Application.h"
 #include "Socket.h"
+
+#include "rapidjson/document.h"
 
 int runConfigurationWorker();
 unsigned __stdcall Answer(void* a);
@@ -18,9 +19,15 @@ public:
 
 private:
 	Socket* socket;
-	Application* app;
 	
 	void parseMessage(std::string request);
+	void parsePutMessage(rapidjson::Document& doc);
+
+	void parseDriverStatePutMessage(rapidjson::Document& doc);
+
+	std::string getErrorResponse(std::string errorMessage);
+	std::string getDriverStateUpdate(std::string state);
 
 	bool running = true;
+
 };
