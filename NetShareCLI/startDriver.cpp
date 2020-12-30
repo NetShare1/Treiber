@@ -36,7 +36,6 @@ void startDriver(int listenPort) {
         std::string l = "";
         while (true) {
             l = s.ReceiveLine();
-            std::cout << l << std::endl;
             rapidjson::Document resDoc;
             if (resDoc.Parse(l.c_str()).HasParseError()) break;
             if (l.empty()) {
@@ -48,43 +47,34 @@ void startDriver(int listenPort) {
                 break;
             }
 
-            if (isResponse(resDoc)) {
+            if (isConnectionCloseResponse(resDoc))
+                break;
 
-                if (isConnectionCloseResponse(resDoc))
-                    break;
+            rapidjson::Value& data = resDoc["data"];
 
-                rapidjson::Value& data = resDoc["data"];
-                if (!data.HasMember("state")) {
-                    std::cout << "Worker returned invalid response object" << std::endl;
-                    break;
-                }
-                if (!data["state"].IsString()) {
-                    std::cout << "Worker returned invalid response object" << std::endl;
-                    break;
-                }
-
-
-
+            if (!data.HasMember("state")) {
+                std::cout << "Worker returned invalid response object" << std::endl;
+                break;
             }
-            else if (isUpdate(resDoc)) {
-
+            if (!data["state"].IsString()) {
+                std::cout << "Worker returned invalid response object" << std::endl;
+                break;
             }
 
-            std::string type = resDoc["type"].GetString();
-            std::string state = resDoc["state"].GetString();
+            std::string state = data["state"].GetString();
 
-            if (state.compare("running") == 0) {
-                std::cout << "VPN Worker is running" << std::endl;
-            }
-            else if (state.compare("startup") == 0) {
-                std::cout << "VPN Worker is starting up" << std::endl;
+            if (state.compare("startup") == 0) {
+                std::cout << "VPN Worker is starting up..." << std::endl;
             }
             else if (state.compare("crashed") == 0) {
-                std::cout << "VPN Worker has crashed during startup please view the logs for more info" << std::endl;
+                std::cout << "VPN Worker crashed during startup. Please view the logs for more information!" << std::endl;
+            }
+            else if (state.compare("running") == 0) {
+                std::cout << "VPN Worker successfully started" << std::endl;
             }
 
-            if (type.compare("Response") == 0) {
-                return s.SendLine(getStopConnectionRequest());
+            if (isResponse(resDoc)) {
+                s.SendLine(getStopConnectionRequest());
             }
         }
     }

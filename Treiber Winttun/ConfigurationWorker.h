@@ -25,6 +25,7 @@ private:
 
 	std::string getErrorResponse(std::string errorMessage);
 	std::string getDriverStateUpdate(std::string state);
+	std::string getDriverStateResponse(std::string state);
 
 	bool running = true;
 

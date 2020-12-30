@@ -87,11 +87,11 @@ void ConfigurationWorker::parsePutMessage(rapidjson::Document& doc)
             if (on.compare("driver.state") == 0) {
                 return parseDriverStatePutMessage(doc);
             }
-            else if (on.compare("connection") == 0) {
+            else if (on.compare("connection.state") == 0) {
                 return parseConnectionStatePutMessage(doc);
             }
             else {
-                socket->SendLine(getErrorResponse("Unknown ressource of \"on\""));
+                socket->SendLine(getErrorResponse("Unknown ressource of \"on\": " + on));
             }
         }
         else {
@@ -197,37 +197,37 @@ void ConfigurationWorker::parseDriverStatePutMessage(rapidjson::Document& doc)
         Application* app = Application::Get();
 
         if (app->isStartingUp()) {
-            socket->SendLine(getDriverStateUpdate("startup"));
+            socket->SendLine(getDriverStateResponse("startup"));
             return;
         }
 
         if (app->isRunning()) {
-            socket->SendLine(getDriverStateUpdate("running"));
+            socket->SendLine(getDriverStateResponse("running"));
             return;
         }
 
         socket->SendLine(getDriverStateUpdate("startup"));
         if (app->initRun()) {
             app->run();
-            socket->SendLine(getDriverStateUpdate("running"));
+            socket->SendLine(getDriverStateResponse("running"));
         }
         else {
-            socket->SendLine(getDriverStateUpdate("crashed"));
+            socket->SendLine(getDriverStateResponse("crashed"));
         }
     }
     else if (state.compare("stopped") == 0) {
         Application* app = Application::Get();
 
         if (app->isStartingUp()) {
-            socket->SendLine(getDriverStateUpdate("startup"));
+            socket->SendLine(getDriverStateResponse("startup"));
             return;
         }
 
         if (app->isRunning()) {
-            socket->SendLine(getDriverStateUpdate("running"));
+            socket->SendLine(getDriverStateResponse("running"));
         }
         else {
-            socket->SendLine(getDriverStateUpdate("stopped"));
+            socket->SendLine(getDriverStateResponse("stopped"));
             return;
         }
 
@@ -235,11 +235,11 @@ void ConfigurationWorker::parseDriverStatePutMessage(rapidjson::Document& doc)
         app->shutdown();
 
         if (app->isRunning()) {
-            socket->SendLine(getDriverStateUpdate("running"));
+            socket->SendLine(getDriverStateResponse("running"));
             return;
         }
         else {
-            socket->SendLine(getDriverStateUpdate("stopped"));
+            socket->SendLine(getDriverStateResponse("stopped"));
             return;
         }
     }
@@ -257,8 +257,29 @@ std::string ConfigurationWorker::getDriverStateUpdate(std::string state)
     writer.StartObject();
     writer.Key("type");
     writer.String("Update");
+    writer.Key("data");
+    writer.StartObject();
     writer.Key("state");
     writer.String(state.c_str());
+    writer.EndObject();
+    writer.EndObject();
+
+    return s.GetString();
+}
+
+std::string ConfigurationWorker::getDriverStateResponse(std::string state)
+{
+    rapidjson::StringBuffer s;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+
+    writer.StartObject();
+    writer.Key("type");
+    writer.String("Response");
+    writer.Key("data");
+    writer.StartObject();
+    writer.Key("state");
+    writer.String(state.c_str());
+    writer.EndObject();
     writer.EndObject();
 
     return s.GetString();
