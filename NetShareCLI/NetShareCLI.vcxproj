@@ -145,10 +145,16 @@
   <ItemGroup>
     <ClCompile Include="NetShareCLI.cpp" />
     <ClCompile Include="Socket.cpp" />
+    <ClCompile Include="startDriver.cpp" />
+    <ClCompile Include="stopDriver.cpp" />
+    <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CLI11.hpp" />
     <ClInclude Include="Socket.h" />
+    <ClInclude Include="startDriver.h" />
+    <ClInclude Include="stopDriver.h" />
+    <ClInclude Include="utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
