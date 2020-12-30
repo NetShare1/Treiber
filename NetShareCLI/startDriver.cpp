@@ -36,6 +36,7 @@ void startDriver(int listenPort) {
         std::string l = "";
         while (true) {
             l = s.ReceiveLine();
+            std::cout << l << std::endl;
             rapidjson::Document resDoc;
             if (resDoc.Parse(l.c_str()).HasParseError()) break;
             if (l.empty()) {

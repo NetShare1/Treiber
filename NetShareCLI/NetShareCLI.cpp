@@ -56,10 +56,10 @@ int main(int argc, char* argv[])
         stopDriver(driverPort);
     }
     else if (configure->parsed()) {
-        configureDriver();
+        //configureDriver();
     }
     else if (print->parsed()) {
-        printDriver();
+        //printDriver();
     }
 }
 
