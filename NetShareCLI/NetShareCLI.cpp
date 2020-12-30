@@ -249,3 +249,51 @@ std::string getStopConnectionRequest() {
 
     return s.GetString();
 }
+
+bool isConnectionCloseResponse(rapidjson::Document doc) {
+    rapidjson::Value& data = doc["data"];
+
+    if (!data.HasMember("connection.state")) {
+        return false;
+    }
+
+    if (!data["connection.state"].IsString()) {
+        return false;
+    }
+
+    std::string s = data["connection.state"].GetString();
+
+    return s.compare("closed") == 0;
+}
+
+bool isValidResponse(rapidjson::Document doc) {
+    if (!doc.HasMember("type")) {
+        return false;
+    }
+
+    if (!doc["type"].IsString()) {
+        return false;
+    }
+
+    if (!doc.HasMember("data")) {
+        return false;
+    }
+
+    if (!doc["data"].IsObject()) {
+        return false;
+    }
+
+    return true;
+}
+
+bool isUpdate(rapidjson::Document doc) {
+    std::string s = doc["type"].GetString();
+
+    return s.compare("Update") == 0;
+}
+
+bool isResponse(rapidjson::Document doc) {
+    std::string s = doc["type"].GetString();
+
+    return s.compare("Response") == 0;
+}

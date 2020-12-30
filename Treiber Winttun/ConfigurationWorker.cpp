@@ -199,7 +199,7 @@ void ConfigurationWorker::parsePutMessage(rapidjson::Document& doc)
 void ConfigurationWorker::parseConnectionStatePutMessage(rapidjson::Document& doc)
 {
     if (!doc.HasMember("data")) {
-        socket->SendLine(getErrorResponse("The Put request needs a \"type\" member"));
+        socket->SendLine(getErrorResponse("The Put request needs a \"data\" member"));
         return;
     }
 
