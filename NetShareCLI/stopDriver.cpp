@@ -1,5 +1,11 @@
 #include "stopDriver.h"
 
+#include "utils.h"
+
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/document.h"
+
 #include "Socket.h"
 
 #include <iostream>
@@ -10,29 +16,67 @@ void stopDriver(int listenPort) {
     try {
         SocketClient s("localhost", listenPort);
 
-        s.SendLine("driver.set.state.stopped\n");
+        rapidjson::StringBuffer sb;
+        rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+
+        writer.StartObject();
+        writer.Key("type");
+        writer.String("Put");
+        writer.Key("on");
+        writer.String("driver.state");
+        writer.Key("data");
+        writer.StartObject();
+        writer.Key("state");
+        writer.String("stopped");
+        writer.EndObject();
+        writer.EndObject();
+
+        std::string request = sb.GetString();
+
+        s.SendLine(request);
 
         std::string l = "";
-        while (l != "connection.state.closed") {
+        while (true) {
             l = s.ReceiveLine();
+            rapidjson::Document resDoc;
+            if (resDoc.Parse(l.c_str()).HasParseError()) break;
             if (l.empty()) {
                 break;
             }
-            l.erase(std::remove(l.begin(), l.end(), '\n'), l.end());
-            if (l == "driver.state.state.startup") {
-                std::cout << "VPN Woker is currently starting up please try again after startup" << std::endl;
-                s.SendLine("connection.set.closed");
+
+            if (!isValidResponse(resDoc)) {
+                std::cout << "Worker returned an invalid Resposne" << std::endl;
+                break;
             }
-            else if (l == "driver.state.state.running") {
-                std::cout << "VPN Worker is currently running ..." << std::endl;
+
+            if (isConnectionCloseResponse(resDoc))
+                break;
+
+            rapidjson::Value& data = resDoc["data"];
+
+            if (!data.HasMember("state")) {
+                std::cout << "Worker returned invalid response object" << std::endl;
+                break;
             }
-            else if (l == "driver.state.state.stopped") {
-                std::cout << "VPN Worker is now not running!" << std::endl;
-                s.SendLine("connection.set.closed");
+            if (!data["state"].IsString()) {
+                std::cout << "Worker returned invalid response object" << std::endl;
+                break;
             }
-            else if (l == "driver.state.state.crashed") {
-                std::cerr << "VPN Woker crashed during startup. Please check the logs for more info" << std::endl;
-                s.SendLine("connection.set.closed");
+
+            std::string state = data["state"].GetString();
+
+            if (state.compare("startup") == 0) {
+                std::cout << "VPN Worker is starting up! Please try again after the Worker has fully started" << std::endl;
+            }
+            else if (state.compare("running") == 0) {
+                std::cout << "VPN Worker currently running. Shutting down..." << std::endl;
+            }
+            else if (state.compare("stopped") == 0) {
+                std::cout << "VPN Worker is stopped" << std::endl;
+            }
+
+            if (isResponse(resDoc)) {
+                s.SendLine(getStopConnectionRequest());
             }
         }
     }
