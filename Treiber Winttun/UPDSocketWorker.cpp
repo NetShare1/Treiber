@@ -178,6 +178,9 @@ int WorkSocket(std::shared_ptr<UDPWorkerConfig> conf) {
 				if (iResult == SOCKET_ERROR) {
 					MTR_SCOPE("UDP_Sending", "Handling Packet Error");
 					if (WSAGetLastError() == WSAEWOULDBLOCK) {
+						// packet could not be sent because internal buffer is full. Try again
+						// next time until all packets are sent away. Could get very CPU intensive
+						i--;
 						continue;
 					}
 					wchar_t* s = NULL;
