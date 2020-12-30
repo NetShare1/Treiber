@@ -179,6 +179,9 @@ void ConfigurationWorker::parsePutMessage(rapidjson::Document& doc)
             if (on.compare("driver.state") == 0) {
                 return parseDriverStatePutMessage(doc);
             }
+            else if (on.compare("connection") == 0) {
+                return parseConnectionStatePutMessage(doc);
+            }
             else {
                 socket->SendLine(getErrorResponse("Unknown ressource of \"on\""));
             }
@@ -190,6 +193,52 @@ void ConfigurationWorker::parsePutMessage(rapidjson::Document& doc)
     }
     else {
         socket->SendLine(getErrorResponse("No member \"on\" provided."));
+    }
+}
+
+void ConfigurationWorker::parseConnectionStatePutMessage(rapidjson::Document& doc)
+{
+    if (!doc.HasMember("data")) {
+        socket->SendLine(getErrorResponse("The Put request needs a \"type\" member"));
+        return;
+    }
+
+    if (!doc["data"].IsObject()) {
+        socket->SendLine(getErrorResponse("Member \"data\" needs to be an object"));
+        return;
+    }
+
+    rapidjson::Value& data = doc["data"];
+    if (!data.HasMember("state")) {
+        socket->SendLine(getErrorResponse("Member \"data\" needs to have a member \"state\""));
+        return;
+    }
+
+    if (!data["state"].IsString()) {
+        socket->SendLine(getErrorResponse("Member \"data.state\" needs to be a string"));
+        return;
+    }
+
+    std::string state = data["state"].GetString();
+
+    if (state.compare("closed") == 0) {
+        running = false;
+
+        rapidjson::StringBuffer s;
+        rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+
+        writer.StartObject();
+        writer.Key("type");
+        writer.String("Response");
+        writer.Key("data");
+        writer.StartObject();
+        writer.Key("state");
+        writer.String("closed");
+        writer.EndObject();
+        writer.EndObject();
+        
+        socket->SendLine(s.GetString());
+        return;
     }
 }
 

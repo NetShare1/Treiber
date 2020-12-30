@@ -23,6 +23,8 @@ private:
 	void parseMessage(std::string request);
 	void parsePutMessage(rapidjson::Document& doc);
 
+	void parseConnectionStatePutMessage(rapidjson::Document& doc);
+
 	void parseDriverStatePutMessage(rapidjson::Document& doc);
 
 	std::string getErrorResponse(std::string errorMessage);
