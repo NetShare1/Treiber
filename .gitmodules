@@ -4,3 +4,6 @@
 [submodule "NetShareCLI/lib/rapidjson"]
 	path = NetShareCLI/lib/rapidjson
 	url = https://github.com/Tencent/rapidjson.git
+[submodule "Treiber Winttun/lib/spdlog"]
+	path = Treiber Winttun/lib/spdlog
+	url = https://github.com/gabime/spdlog.git
