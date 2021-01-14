@@ -164,5 +164,8 @@
     <ClCompile Include="AppConfig.cpp">
       <Filter>Source Files\Config</Filter>
     </ClCompile>
+    <ClCompile Include="log.cpp">
+      <Filter>Source Files\Diagnostics</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
