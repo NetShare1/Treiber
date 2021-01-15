@@ -21,9 +21,9 @@ void Application::run()
     Workers[1] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)SendPackets, (LPVOID)&wintunSendConf, 0, NULL);
     for (int i = 2; i < numberOfWorkers; i++) {
         NS_LOG_APP_DEBUG("Starting Thread {}", i);
-        Workers[i] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)WorkSocket, (LPVOID)&udpconfigs->at(i - 2), 0, NULL);
+        Workers[i] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)WorkSocket, (LPVOID)&udpconfigsReferences->at(i - 2), 0, NULL);
     }
-
+    
     // route delete 0.0.0.0
     // route -p add 0.0.0.0 mask 0.0.0.0 10.0.0.1
 
@@ -124,6 +124,11 @@ bool Application::initRun()
     conf->quitEvent = CreateEventW(NULL, TRUE, FALSE, NULL);
 
     udpconfigs = adapterList->generateUDPConfigs(conf);
+    udpconfigsReferences = new std::vector<std::shared_ptr<UDPWorkerConfig>>();
+    for (int i = 0; i < udpconfigs->size(); i++) {
+        // add references
+        udpconfigsReferences->push_back(udpconfigs->at(i));
+    }
 
 
     conf->adapterHandle =
@@ -209,6 +214,7 @@ void Application::shutdown()
     wintunReceiveConf = nullptr;
     wintunSendConf = nullptr;
     delete udpconfigs;
+    delete udpconfigsReferences;
     NS_LOG_APP_INFO("Shutdown successful");
 }
 

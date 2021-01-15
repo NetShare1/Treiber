@@ -814,4 +814,442 @@
 [17:14:30.452949] [I] [thread 25232] Start sucessful
 [17:14:30.465697] [I] [thread 25232] New message recieved: {"type":"Put","on":"connection.state","data":{"state":"closed"}}
 
-[17:14:36.621856] [I] [thread 30620] 
+[17:14:36.621856] [I] [thread 30620] [23:18:02.416668] [I] [thread 32064] Listening for connections
+[23:18:06.548214] [I] [thread 28620] New configuration connection established
+[23:18:06.549462] [I] [thread 28620] New configuration connection established
+[23:18:06.550776] [I] [thread 28620] New message recieved: {"type":"Put","on":"driver.state","data":{"state":"running"}}
+
+[23:18:06.552664] [T] [thread 28620] Reading internal config
+[23:18:06.665083] [D] [thread 28620] Sucessfully loaded wintun dll
+[23:18:06.682758] [D] [thread 28620] Added Adapter:
+   name: {F7841F6C-C438-43A1-BB00-865117BA7BBB}
+   desc: Bluetooth Device (Personal Area Network)
+   IP: 0.0.0.0
+[23:18:06.683957] [D] [thread 28620] Added Adapter:
+   name: {1AA970A7-772E-4D42-849A-FFFBEB4ACB47}
+   desc: TAP-NordVPN Windows Adapter V9
+   IP: 0.0.0.0
+[23:18:06.684672] [D] [thread 28620] Added Adapter:
+   name: {31FB6B02-3C5E-4991-85BB-9BAF4B6F9ACB}
+   desc: Hyper-V Virtual Ethernet Adapter
+   IP: 172.17.205.177
+[23:18:06.685466] [D] [thread 28620] Added Adapter:
+   name: {BACA9EF2-D523-4D4F-85AD-934AA5823B23}
+   desc: VirtualBox Host-Only Ethernet Adapter
+   IP: 192.168.56.1
+[23:18:06.686343] [D] [thread 28620] Added Adapter:
+   name: {3AD86B1C-2157-4A6A-9A18-DE035E721241}
+   desc: Wintun Userspace Tunnel
+   IP: 0.0.0.0
+[23:18:06.687081] [D] [thread 28620] Added Adapter:
+   name: {72B9C418-4116-4730-B564-481DBCF0B33F}
+   desc: TAP-Windows Adapter V9
+   IP: 0.0.0.0
+[23:18:06.687731] [D] [thread 28620] Added Adapter:
+   name: {0F82486D-AC51-4FEC-812B-B902EDA2BCBC}
+   desc: Wintun Userspace Tunnel #2
+   IP: 0.0.0.0
+[23:18:06.688238] [D] [thread 28620] Added Adapter:
+   name: {CCCCCCCC-CCCC-CCCC-CCCC-CCCCCCCCCCCC}
+   desc: Netshare Tunnel
+   IP: 0.0.0.0
+[23:18:06.688775] [D] [thread 28620] Added Adapter:
+   name: {B6BBCC6F-E3F6-47AF-8869-B52D441F9AE8}
+   desc: Intel(R) Wi-Fi 6 AX201 160MHz
+   IP: 192.168.1.31
+[23:18:06.689591] [D] [thread 28620] Added Adapter:
+   name: {874DD5D0-982F-4C80-A70B-6D6E3584DC29}
+   desc: Microsoft Wi-Fi Direct Virtual Adapter
+   IP: 0.0.0.0
+[23:18:06.690320] [D] [thread 28620] Added Adapter:
+   name: {B7859EB6-D01B-4DCF-9581-073191481515}
+   desc: Microsoft Wi-Fi Direct Virtual Adapter #2
+   IP: 0.0.0.0
+[23:18:06.691142] [D] [thread 28620] Using adapter Bluetooth Device (Personal Area Network) ? false
+[23:18:06.705101] [D] [thread 28620] Using adapter TAP-NordVPN Windows Adapter V9 ? false
+[23:18:06.711090] [D] [thread 28620] Using adapter Hyper-V Virtual Ethernet Adapter ? false
+[23:18:06.712320] [D] [thread 28620] Using adapter VirtualBox Host-Only Ethernet Adapter ? false
+[23:18:06.717138] [D] [thread 28620] Using adapter Wintun Userspace Tunnel ? false
+[23:18:06.723465] [D] [thread 28620] Using adapter TAP-Windows Adapter V9 ? false
+[23:18:06.728921] [D] [thread 28620] Using adapter Wintun Userspace Tunnel #2 ? false
+[23:18:06.730705] [D] [thread 28620] Using adapter Netshare Tunnel ? false
+[23:18:06.736873] [D] [thread 28620] Using adapter Intel(R) Wi-Fi 6 AX201 160MHz ? true
+[23:18:06.741214] [D] [thread 28620] Using adapter Microsoft Wi-Fi Direct Virtual Adapter ? false
+[23:18:06.747786] [D] [thread 28620] Using adapter Microsoft Wi-Fi Direct Virtual Adapter #2 ? false
+[23:18:06.751805] [D] [thread 28620] Successfully binded socket on 192.168.1.31:65530
+[23:18:07.113974] [D] [thread 28620] Trying to get handle of Adapter
+[23:18:07.114796] [D] [thread 28620] Got Adapter handle
+[23:18:07.116057] [D] [thread 28620] Set Ip Adress to: 10.0.0.3/24
+[23:18:07.143084] [D] [thread 28620] Successfully started Session
+[23:18:07.152971] [I] [thread 28620] Sucessfully inited
+[23:18:07.154948] [T] [thread 28620] Creating a total of 4 worker threads
+[23:18:07.179898] [D] [thread 28620] Starting Thread 2
+[23:18:07.196075] [D] [thread 28620] Starting Thread 3
+[23:18:27.674173] [I] [thread 28620] The Control Handler is installed.
+[23:18:29.955739] [I] [thread 28620] Start sucessful
+[23:18:29.967566] [I] [thread 28620] New message recieved: {"type":"Put","on":"connection.state","data":{"state":"closed"}}
+
+[23:18:39.988978] [I] [thread 13344] [23:19:44.902191] [I] [thread 24388] Listening for connections
+[23:19:53.344580] [I] [thread 32468] New configuration connection established
+[23:19:53.345982] [I] [thread 32468] New configuration connection established
+[23:19:53.347004] [I] [thread 32468] New message recieved: {"type":"Put","on":"driver.state","data":{"state":"running"}}
+
+[23:19:53.348682] [T] [thread 32468] Reading internal config
+[23:19:53.450949] [D] [thread 32468] Sucessfully loaded wintun dll
+[23:19:53.467809] [D] [thread 32468] Added Adapter:
+   name: {F7841F6C-C438-43A1-BB00-865117BA7BBB}
+   desc: Bluetooth Device (Personal Area Network)
+   IP: 0.0.0.0
+[23:19:53.468967] [D] [thread 32468] Added Adapter:
+   name: {1AA970A7-772E-4D42-849A-FFFBEB4ACB47}
+   desc: TAP-NordVPN Windows Adapter V9
+   IP: 0.0.0.0
+[23:19:53.469438] [D] [thread 32468] Added Adapter:
+   name: {31FB6B02-3C5E-4991-85BB-9BAF4B6F9ACB}
+   desc: Hyper-V Virtual Ethernet Adapter
+   IP: 172.17.205.177
+[23:19:53.471534] [D] [thread 32468] Added Adapter:
+   name: {BACA9EF2-D523-4D4F-85AD-934AA5823B23}
+   desc: VirtualBox Host-Only Ethernet Adapter
+   IP: 192.168.56.1
+[23:19:53.472515] [D] [thread 32468] Added Adapter:
+   name: {3AD86B1C-2157-4A6A-9A18-DE035E721241}
+   desc: Wintun Userspace Tunnel
+   IP: 0.0.0.0
+[23:19:53.473019] [D] [thread 32468] Added Adapter:
+   name: {72B9C418-4116-4730-B564-481DBCF0B33F}
+   desc: TAP-Windows Adapter V9
+   IP: 0.0.0.0
+[23:19:53.473557] [D] [thread 32468] Added Adapter:
+   name: {0F82486D-AC51-4FEC-812B-B902EDA2BCBC}
+   desc: Wintun Userspace Tunnel #2
+   IP: 0.0.0.0
+[23:19:53.474280] [D] [thread 32468] Added Adapter:
+   name: {CCCCCCCC-CCCC-CCCC-CCCC-CCCCCCCCCCCC}
+   desc: Netshare Tunnel
+   IP: 0.0.0.0
+[23:19:53.475044] [D] [thread 32468] Added Adapter:
+   name: {B6BBCC6F-E3F6-47AF-8869-B52D441F9AE8}
+   desc: Intel(R) Wi-Fi 6 AX201 160MHz
+   IP: 192.168.1.31
+[23:19:53.475777] [D] [thread 32468] Added Adapter:
+   name: {874DD5D0-982F-4C80-A70B-6D6E3584DC29}
+   desc: Microsoft Wi-Fi Direct Virtual Adapter
+   IP: 0.0.0.0
+[23:19:53.476646] [D] [thread 32468] Added Adapter:
+   name: {B7859EB6-D01B-4DCF-9581-073191481515}
+   desc: Microsoft Wi-Fi Direct Virtual Adapter #2
+   IP: 0.0.0.0
+[23:19:53.478440] [D] [thread 32468] Using adapter Bluetooth Device (Personal Area Network) ? false
+[23:19:53.491294] [D] [thread 32468] Using adapter TAP-NordVPN Windows Adapter V9 ? false
+[23:19:53.492683] [D] [thread 32468] Using adapter Hyper-V Virtual Ethernet Adapter ? false
+[23:19:53.494209] [D] [thread 32468] Using adapter VirtualBox Host-Only Ethernet Adapter ? false
+[23:19:53.495464] [D] [thread 32468] Using adapter Wintun Userspace Tunnel ? false
+[23:19:53.496768] [D] [thread 32468] Using adapter TAP-Windows Adapter V9 ? false
+[23:19:53.498400] [D] [thread 32468] Using adapter Wintun Userspace Tunnel #2 ? false
+[23:19:53.504608] [D] [thread 32468] Using adapter Netshare Tunnel ? false
+[23:19:53.509585] [D] [thread 32468] Using adapter Intel(R) Wi-Fi 6 AX201 160MHz ? true
+[23:19:53.511124] [D] [thread 32468] Using adapter Microsoft Wi-Fi Direct Virtual Adapter ? false
+[23:19:53.516084] [D] [thread 32468] Using adapter Microsoft Wi-Fi Direct Virtual Adapter #2 ? false
+[23:19:53.523337] [D] [thread 32468] Successfully binded socket on 192.168.1.31:65530
+[23:19:53.887688] [D] [thread 32468] Trying to get handle of Adapter
+[23:19:53.888459] [D] [thread 32468] Got Adapter handle
+[23:19:53.889404] [D] [thread 32468] Set Ip Adress to: 10.0.0.3/24
+[23:19:53.923443] [D] [thread 32468] Successfully started Session
+[23:19:53.989007] [I] [thread 32468] Sucessfully inited
+[23:19:54.029977] [T] [thread 32468] Creating a total of 4 worker threads
+[23:19:54.037381] [D] [thread 32468] Starting Thread 2
+[23:19:54.039976] [D] [thread 32468] Starting Thread 3
+[23:19:54.044171] [I] [thread 32468] The Control Handler is installed.
+[23:19:54.046217] [I] [thread 32468] Start sucessful
+[23:19:54.054703] [I] [thread 32468] New message recieved: {"type":"Put","on":"connection.state","data":{"state":"closed"}}
+
+[23:19:58.581090] [I] [thread 15564] [23:38:36.269352] [I] [thread 15712] Listening for connections
+[23:38:44.019190] [I] [thread 36316] New configuration connection established
+[23:38:44.020491] [I] [thread 36316] New configuration connection established
+[23:38:44.021618] [I] [thread 36316] New message recieved: {"type":"Put","on":"driver.state","data":{"state":"running"}}
+
+[23:38:44.023227] [T] [thread 36316] Reading internal config
+[23:38:44.115202] [D] [thread 36316] Sucessfully loaded wintun dll
+[23:38:44.126488] [D] [thread 36316] Added Adapter:
+   name: {F7841F6C-C438-43A1-BB00-865117BA7BBB}
+   desc: Bluetooth Device (Personal Area Network)
+   IP: 0.0.0.0
+[23:38:44.127468] [D] [thread 36316] Added Adapter:
+   name: {1AA970A7-772E-4D42-849A-FFFBEB4ACB47}
+   desc: TAP-NordVPN Windows Adapter V9
+   IP: 0.0.0.0
+[23:38:44.128725] [D] [thread 36316] Added Adapter:
+   name: {31FB6B02-3C5E-4991-85BB-9BAF4B6F9ACB}
+   desc: Hyper-V Virtual Ethernet Adapter
+   IP: 172.17.205.177
+[23:38:44.129711] [D] [thread 36316] Added Adapter:
+   name: {BACA9EF2-D523-4D4F-85AD-934AA5823B23}
+   desc: VirtualBox Host-Only Ethernet Adapter
+   IP: 192.168.56.1
+[23:38:44.130445] [D] [thread 36316] Added Adapter:
+   name: {3AD86B1C-2157-4A6A-9A18-DE035E721241}
+   desc: Wintun Userspace Tunnel
+   IP: 0.0.0.0
+[23:38:44.131190] [D] [thread 36316] Added Adapter:
+   name: {72B9C418-4116-4730-B564-481DBCF0B33F}
+   desc: TAP-Windows Adapter V9
+   IP: 0.0.0.0
+[23:38:44.131901] [D] [thread 36316] Added Adapter:
+   name: {0F82486D-AC51-4FEC-812B-B902EDA2BCBC}
+   desc: Wintun Userspace Tunnel #2
+   IP: 0.0.0.0
+[23:38:44.132464] [D] [thread 36316] Added Adapter:
+   name: {CCCCCCCC-CCCC-CCCC-CCCC-CCCCCCCCCCCC}
+   desc: Netshare Tunnel
+   IP: 0.0.0.0
+[23:38:44.137097] [D] [thread 36316] Added Adapter:
+   name: {B6BBCC6F-E3F6-47AF-8869-B52D441F9AE8}
+   desc: Intel(R) Wi-Fi 6 AX201 160MHz
+   IP: 192.168.1.31
+[23:38:44.137801] [D] [thread 36316] Added Adapter:
+   name: {874DD5D0-982F-4C80-A70B-6D6E3584DC29}
+   desc: Microsoft Wi-Fi Direct Virtual Adapter
+   IP: 0.0.0.0
+[23:38:44.138379] [D] [thread 36316] Added Adapter:
+   name: {B7859EB6-D01B-4DCF-9581-073191481515}
+   desc: Microsoft Wi-Fi Direct Virtual Adapter #2
+   IP: 0.0.0.0
+[23:38:44.139165] [D] [thread 36316] Using adapter Bluetooth Device (Personal Area Network) ? false
+[23:38:44.141509] [D] [thread 36316] Using adapter TAP-NordVPN Windows Adapter V9 ? false
+[23:38:44.142521] [D] [thread 36316] Using adapter Hyper-V Virtual Ethernet Adapter ? false
+[23:38:44.143628] [D] [thread 36316] Using adapter VirtualBox Host-Only Ethernet Adapter ? false
+[23:38:44.144636] [D] [thread 36316] Using adapter Wintun Userspace Tunnel ? false
+[23:38:44.150098] [D] [thread 36316] Using adapter TAP-Windows Adapter V9 ? false
+[23:38:44.155912] [D] [thread 36316] Using adapter Wintun Userspace Tunnel #2 ? false
+[23:38:44.157012] [D] [thread 36316] Using adapter Netshare Tunnel ? false
+[23:38:44.157864] [D] [thread 36316] Using adapter Intel(R) Wi-Fi 6 AX201 160MHz ? true
+[23:38:44.161057] [D] [thread 36316] Using adapter Microsoft Wi-Fi Direct Virtual Adapter ? false
+[23:38:44.168058] [D] [thread 36316] Using adapter Microsoft Wi-Fi Direct Virtual Adapter #2 ? false
+[23:38:44.170990] [D] [thread 36316] Successfully binded socket on 192.168.1.31:65530
+[23:38:44.489706] [D] [thread 36316] Trying to get handle of Adapter
+[23:38:44.490471] [D] [thread 36316] Got Adapter handle
+[23:38:44.492644] [D] [thread 36316] Set Ip Adress to: 10.0.0.3/24
+[23:38:44.526220] [D] [thread 36316] Successfully started Session
+[23:38:44.551818] [I] [thread 36316] Sucessfully inited
+[23:38:44.611621] [T] [thread 36316] Creating a total of 4 worker threads
+[23:38:44.628722] [D] [thread 36316] Starting Thread 2
+[23:38:44.631554] [D] [thread 36316] Starting Thread 3
+[23:38:44.635635] [I] [thread 36316] The Control Handler is installed.
+[23:38:44.636118] [I] [thread 36316] Start sucessful
+[23:38:44.641650] [I] [thread 36316] New message recieved: {"type":"Put","on":"connection.state","data":{"state":"closed"}}
+
+[23:38:50.047647] [I] [thread 13284] New configuration connection established
+[23:38:50.057241] [I] [thread 13284] New configuration connection established
+[23:38:50.063349] [I] [thread 13284] New message recieved: {"type":"Put","on":"driver.state","data":{"state":"stopped"}}
+
+[23:38:50.078765] [I] [thread 13284] Messages Recieved on tun device:  52
+[23:38:50.101501] [I] [thread 13284] Messages Sent on tun device:      0
+[23:38:50.119563] [I] [thread 13284] Messages Recieved on udp sockets: 0
+[23:38:50.135228] [I] [thread 13284] Messages Sent on udp sockets:     54
+[23:38:50.176884] [D] [thread 13284] Shutting down
+[23:38:50.180196] [T] [thread 13284] Release all blocks
+[23:39:05.494304] [D] [thread 13284] Shutting down Workers
+[23:39:12.844587] [T] [thread 13284] Closed Worker 0
+[23:39:12.851543] [T] [thread 13284] Closed Worker 1
+[23:39:12.857694] [T] [thread 13284] Closed Worker 2
+[23:39:12.859652] [T] [thread 13284] Closed Worker 3
+[23:39:12.867396] [D] [thread 13284] Workers shut down
+[23:39:12.869221] [D] [thread 13284] Shutting down UDP Sockets
+[23:39:48.220152] [D] [thread 13284] Sockets closed
+[23:39:48.281756] [D] [thread 13284] Ended Wintun Session
+[23:39:48.698396] [D] [thread 13284] Freed Wintun Adapter
+[23:39:48.794883] [T] [thread 13284] Shutted down profilling
+[23:39:48.837946] [I] [thread 13284] Shutdown successful
+[23:39:48.843797] [I] [thread 13284] New message recieved: {"type":"Put","on":"connection.state","data":{"state":"closed"}}
+
+[23:39:54.418078] [I] [thread 27868] New configuration connection established
+[23:39:54.419165] [I] [thread 27868] New configuration connection established
+[23:39:54.420768] [I] [thread 27868] New message recieved: {"type":"Put","on":"driver.state","data":{"state":"running"}}
+
+[23:39:54.422196] [T] [thread 27868] Reading internal config
+[23:39:54.430004] [W] [thread 27868] Logger already exists dropping new one
+[23:39:54.434151] [D] [thread 27868] Sucessfully loaded wintun dll
+[23:39:54.453112] [D] [thread 27868] Added Adapter:
+   name: {F7841F6C-C438-43A1-BB00-865117BA7BBB}
+   desc: Bluetooth Device (Personal Area Network)
+   IP: 0.0.0.0
+[23:39:54.454890] [D] [thread 27868] Added Adapter:
+   name: {1AA970A7-772E-4D42-849A-FFFBEB4ACB47}
+   desc: TAP-NordVPN Windows Adapter V9
+   IP: 0.0.0.0
+[23:39:54.456132] [D] [thread 27868] Added Adapter:
+   name: {31FB6B02-3C5E-4991-85BB-9BAF4B6F9ACB}
+   desc: Hyper-V Virtual Ethernet Adapter
+   IP: 172.17.205.177
+[23:39:54.466838] [D] [thread 27868] Added Adapter:
+   name: {BACA9EF2-D523-4D4F-85AD-934AA5823B23}
+   desc: VirtualBox Host-Only Ethernet Adapter
+   IP: 192.168.56.1
+[23:39:54.472182] [D] [thread 27868] Added Adapter:
+   name: {3AD86B1C-2157-4A6A-9A18-DE035E721241}
+   desc: Wintun Userspace Tunnel
+   IP: 0.0.0.0
+[23:39:54.473709] [D] [thread 27868] Added Adapter:
+   name: {72B9C418-4116-4730-B564-481DBCF0B33F}
+   desc: TAP-Windows Adapter V9
+   IP: 0.0.0.0
+[23:39:54.475182] [D] [thread 27868] Added Adapter:
+   name: {0F82486D-AC51-4FEC-812B-B902EDA2BCBC}
+   desc: Wintun Userspace Tunnel #2
+   IP: 0.0.0.0
+[23:39:54.485003] [D] [thread 27868] Added Adapter:
+   name: {CCCCCCCC-CCCC-CCCC-CCCC-CCCCCCCCCCCC}
+   desc: Netshare Tunnel
+   IP: 0.0.0.0
+[23:39:54.486088] [D] [thread 27868] Added Adapter:
+   name: {B6BBCC6F-E3F6-47AF-8869-B52D441F9AE8}
+   desc: Intel(R) Wi-Fi 6 AX201 160MHz
+   IP: 192.168.1.31
+[23:39:54.487304] [D] [thread 27868] Added Adapter:
+   name: {874DD5D0-982F-4C80-A70B-6D6E3584DC29}
+   desc: Microsoft Wi-Fi Direct Virtual Adapter
+   IP: 0.0.0.0
+[23:39:54.491113] [D] [thread 27868] Added Adapter:
+   name: {B7859EB6-D01B-4DCF-9581-073191481515}
+   desc: Microsoft Wi-Fi Direct Virtual Adapter #2
+   IP: 0.0.0.0
+[23:39:54.498365] [D] [thread 27868] Using adapter Bluetooth Device (Personal Area Network) ? false
+[23:39:54.502710] [D] [thread 27868] Using adapter TAP-NordVPN Windows Adapter V9 ? false
+[23:39:54.508414] [D] [thread 27868] Using adapter Hyper-V Virtual Ethernet Adapter ? false
+[23:39:54.513968] [D] [thread 27868] Using adapter VirtualBox Host-Only Ethernet Adapter ? false
+[23:39:54.515604] [D] [thread 27868] Using adapter Wintun Userspace Tunnel ? false
+[23:39:54.521279] [D] [thread 27868] Using adapter TAP-Windows Adapter V9 ? false
+[23:39:54.525533] [D] [thread 27868] Using adapter Wintun Userspace Tunnel #2 ? false
+[23:39:54.532587] [D] [thread 27868] Using adapter Netshare Tunnel ? false
+[23:39:54.536560] [D] [thread 27868] Using adapter Intel(R) Wi-Fi 6 AX201 160MHz ? true
+[23:39:54.538223] [D] [thread 27868] Using adapter Microsoft Wi-Fi Direct Virtual Adapter ? false
+[23:39:54.543470] [D] [thread 27868] Using adapter Microsoft Wi-Fi Direct Virtual Adapter #2 ? false
+[23:39:54.545305] [D] [thread 27868] Successfully binded socket on 192.168.1.31:65530
+[23:39:54.852437] [D] [thread 27868] Trying to get handle of Adapter
+[23:39:54.853149] [D] [thread 27868] Got Adapter handle
+[23:39:54.854162] [D] [thread 27868] Set Ip Adress to: 10.0.0.3/24
+[23:39:54.889281] [D] [thread 27868] Successfully started Session
+[23:39:54.915586] [I] [thread 27868] Sucessfully inited
+[23:39:54.951473] [T] [thread 27868] Creating a total of 4 worker threads
+[23:39:54.956243] [D] [thread 27868] Starting Thread 2
+[23:39:54.963593] [W] [thread 7724] Logger already exists dropping new one
+[23:39:54.966529] [W] [thread 21108] Logger already exists dropping new one
+[23:39:54.969894] [D] [thread 27868] Starting Thread 3
+[23:39:54.975118] [W] [thread 20032] Logger already exists dropping new one
+[23:39:54.979913] [I] [thread 27868] The Control Handler is installed.
+[23:39:54.986098] [W] [thread 6936] Logger already exists dropping new one
+[23:39:54.986378] [I] [thread 27868] Start sucessful
+[23:39:54.994151] [I] [thread 27868] New message recieved: {"type":"Put","on":"connection.state","data":{"state":"closed"}}
+
+[23:39:58.774673] [I] [thread 14128] New configuration connection established
+[23:39:58.775823] [I] [thread 14128] New configuration connection established
+[23:39:58.776840] [I] [thread 14128] New message recieved: {"type":"Put","on":"driver.state","data":{"state":"stopped"}}
+
+[23:39:58.777958] [I] [thread 14128] Messages Recieved on tun device:  39
+[23:39:58.785821] [I] [thread 14128] Messages Sent on tun device:      0
+[23:39:58.787461] [I] [thread 14128] Messages Recieved on udp sockets: 0
+[23:39:58.789385] [I] [thread 14128] Messages Sent on udp sockets:     39
+[23:39:58.800563] [D] [thread 14128] Shutting down
+[23:39:58.808936] [T] [thread 14128] Release all blocks
+[23:40:03.011844] [D] [thread 14128] Shutting down Workers
+[23:40:03.035380] [T] [thread 14128] Closed Worker 0
+[23:40:03.042923] [T] [thread 14128] Closed Worker 1
+[23:40:03.047262] [T] [thread 14128] Closed Worker 2
+[23:40:03.048603] [T] [thread 14128] Closed Worker 3
+[23:40:03.054389] [D] [thread 14128] Workers shut down
+[23:40:03.058341] [D] [thread 14128] Shutting down UDP Sockets
+[23:40:05.493952] [D] [thread 14128] Sockets closed
+[23:40:05.558247] [D] [thread 14128] Ended Wintun Session
+[23:40:05.884583] [D] [thread 14128] Freed Wintun Adapter
+[23:40:05.981939] [T] [thread 14128] Shutted down profilling
+[23:40:06.010178] [I] [thread 14128] Shutdown successful
+[23:40:06.015360] [I] [thread 14128] New message recieved: {"type":"Put","on":"connection.state","data":{"state":"closed"}}
+
+[23:40:10.218490] [I] [thread 32436] New configuration connection established
+[23:40:10.219769] [I] [thread 32436] New configuration connection established
+[23:40:10.221701] [I] [thread 32436] New message recieved: {"type":"Put","on":"driver.state","data":{"state":"running"}}
+
+[23:40:10.223795] [T] [thread 32436] Reading internal config
+[23:40:10.228245] [W] [thread 32436] Logger already exists dropping new one
+[23:40:10.242363] [D] [thread 32436] Sucessfully loaded wintun dll
+[23:40:10.254898] [D] [thread 32436] Added Adapter:
+   name: {F7841F6C-C438-43A1-BB00-865117BA7BBB}
+   desc: Bluetooth Device (Personal Area Network)
+   IP: 0.0.0.0
+[23:40:10.255862] [D] [thread 32436] Added Adapter:
+   name: {1AA970A7-772E-4D42-849A-FFFBEB4ACB47}
+   desc: TAP-NordVPN Windows Adapter V9
+   IP: 0.0.0.0
+[23:40:10.257712] [D] [thread 32436] Added Adapter:
+   name: {31FB6B02-3C5E-4991-85BB-9BAF4B6F9ACB}
+   desc: Hyper-V Virtual Ethernet Adapter
+   IP: 172.17.205.177
+[23:40:10.266965] [D] [thread 32436] Added Adapter:
+   name: {BACA9EF2-D523-4D4F-85AD-934AA5823B23}
+   desc: VirtualBox Host-Only Ethernet Adapter
+   IP: 192.168.56.1
+[23:40:10.271570] [D] [thread 32436] Added Adapter:
+   name: {3AD86B1C-2157-4A6A-9A18-DE035E721241}
+   desc: Wintun Userspace Tunnel
+   IP: 0.0.0.0
+[23:40:10.280006] [D] [thread 32436] Added Adapter:
+   name: {72B9C418-4116-4730-B564-481DBCF0B33F}
+   desc: TAP-Windows Adapter V9
+   IP: 0.0.0.0
+[23:40:10.287203] [D] [thread 32436] Added Adapter:
+   name: {0F82486D-AC51-4FEC-812B-B902EDA2BCBC}
+   desc: Wintun Userspace Tunnel #2
+   IP: 0.0.0.0
+[23:40:10.292531] [D] [thread 32436] Added Adapter:
+   name: {CCCCCCCC-CCCC-CCCC-CCCC-CCCCCCCCCCCC}
+   desc: Netshare Tunnel
+   IP: 0.0.0.0
+[23:40:10.297779] [D] [thread 32436] Added Adapter:
+   name: {B6BBCC6F-E3F6-47AF-8869-B52D441F9AE8}
+   desc: Intel(R) Wi-Fi 6 AX201 160MHz
+   IP: 192.168.1.31
+[23:40:10.299728] [D] [thread 32436] Added Adapter:
+   name: {874DD5D0-982F-4C80-A70B-6D6E3584DC29}
+   desc: Microsoft Wi-Fi Direct Virtual Adapter
+   IP: 0.0.0.0
+[23:40:10.304625] [D] [thread 32436] Added Adapter:
+   name: {B7859EB6-D01B-4DCF-9581-073191481515}
+   desc: Microsoft Wi-Fi Direct Virtual Adapter #2
+   IP: 0.0.0.0
+[23:40:10.308684] [D] [thread 32436] Using adapter Bluetooth Device (Personal Area Network) ? false
+[23:40:10.309899] [D] [thread 32436] Using adapter TAP-NordVPN Windows Adapter V9 ? false
+[23:40:10.311060] [D] [thread 32436] Using adapter Hyper-V Virtual Ethernet Adapter ? false
+[23:40:10.312370] [D] [thread 32436] Using adapter VirtualBox Host-Only Ethernet Adapter ? false
+[23:40:10.317500] [D] [thread 32436] Using adapter Wintun Userspace Tunnel ? false
+[23:40:10.321758] [D] [thread 32436] Using adapter TAP-Windows Adapter V9 ? false
+[23:40:10.323614] [D] [thread 32436] Using adapter Wintun Userspace Tunnel #2 ? false
+[23:40:10.325219] [D] [thread 32436] Using adapter Netshare Tunnel ? false
+[23:40:10.334367] [D] [thread 32436] Using adapter Intel(R) Wi-Fi 6 AX201 160MHz ? true
+[23:40:10.336230] [D] [thread 32436] Using adapter Microsoft Wi-Fi Direct Virtual Adapter ? false
+[23:40:10.337413] [D] [thread 32436] Using adapter Microsoft Wi-Fi Direct Virtual Adapter #2 ? false
+[23:40:10.338608] [D] [thread 32436] Successfully binded socket on 192.168.1.31:65530
+[23:40:10.506994] [D] [thread 32436] Trying to get handle of Adapter
+[23:40:10.507880] [D] [thread 32436] Got Adapter handle
+[23:40:10.510942] [D] [thread 32436] Set Ip Adress to: 10.0.0.3/24
+[23:40:10.549449] [D] [thread 32436] Successfully started Session
+[23:40:10.610643] [I] [thread 32436] Sucessfully inited
+[23:40:10.619075] [T] [thread 32436] Creating a total of 4 worker threads
+[23:40:10.621929] [D] [thread 32436] Starting Thread 2
+[23:40:10.633547] [W] [thread 12224] Logger already exists dropping new one
+[23:40:10.636785] [D] [thread 32436] Starting Thread 3
+[23:40:10.639294] [W] [thread 18580] Logger already exists dropping new one
+[23:40:10.641153] [W] [thread 34164] Logger already exists dropping new one
+[23:40:10.686940] [I] [thread 32436] The Control Handler is installed.
+[23:40:10.687720] [I] [thread 32436] Start sucessful
+[23:40:10.689665] [W] [thread 18908] Logger already exists dropping new one
+[23:40:10.691632] [I] [thread 32436] New message recieved: {"type":"Put","on":"connection.state","data":{"state":"closed"}}
+
+[23:40:21.653406] [I] [thread 20128] New configuration connection established
+[23:40:21.654727] [I] [thread 20128] New configuration connection established
+[23:40:21.657650] [I] [thread 20128] New message recieved: {"type":"Put","on":"driver.state","data":{"state":"stopped"}}
+
+[23:40:21.661796] [I] [thread 20128] Messages Recieved on tun device:  173
+[23:40:21.674553] [I] [thread 20128] Messages Sent on tun device:      0
+[23:40:21.690839] [I] [thread 20128] Messages Recieved on udp sockets: 0
+[23:40:21.703604] [I] [thread 20128] Messages Sent on udp so

@@ -125,6 +125,7 @@ void shutdownWSA() {
 }
 
 int WorkSocket(std::shared_ptr<UDPWorkerConfig> conf) {
+
 #ifdef NS_PERF_PROFILE
 	std::string threadName = "UDPWorker Thread " + conf->uid;
 	threadName += conf->reciever ? " [receiving]" : " [sending]";

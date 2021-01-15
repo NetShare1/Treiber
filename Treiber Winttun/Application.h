@@ -83,6 +83,14 @@ private:
 	std::unique_ptr<std::vector<std::string>> adapterNames;
 	std::vector<std::shared_ptr<UDPWorkerConfig>>* udpconfigs;
 
+	// this is very ugly and hard to maintain but for now i dont have a better solution in mind
+	// this will hold second references to every udpconfig. So they dont get deleted after a worker thread
+	// shutsdown. The configs will be copied into the worker threads using memcopy so the reference
+	// count doesnt go up. So I need to different list so one represetents to config in the thread and
+	// the other one here to clear the sockets after the threads have shutdown
+	std::vector<std::shared_ptr<UDPWorkerConfig>>* udpconfigsReferences;
+
+
 	int numberOfWorkers;
 	HANDLE* Workers;
 
