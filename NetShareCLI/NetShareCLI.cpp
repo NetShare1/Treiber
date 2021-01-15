@@ -5,6 +5,7 @@
 
 #include "startDriver.h"
 #include "stopDriver.h"
+#include "killDeamon.h"
 
 #include "CLI11.hpp"
 
@@ -26,7 +27,8 @@ int main(int argc, char* argv[])
     CLI::App* stop = app.add_subcommand("stop", "Stop the VPN Worker");
     CLI::App* print = app.add_subcommand("print", "Prints the Settings of the App");
     CLI::App* configure = app.add_subcommand("configure", "Interactive way to configure VPN Worker. If one Option is used it will not be interactive anymore");
-
+    CLI::App* kill = app.add_subcommand("kill", "Kills the VPN Worker Deamon. Only use this if the VPN Worker stopped working");
+    CLI::App* awake = app.add_subcommand("awake", "Starts the VPN Worker Deamon. Only functions if the deamon is not currently running. NEEDS ADMINISTRATIVE PRIVILAGES");
 
     int serverPort;
     configure->add_option("--serverPort", serverPort, "Sets the port of the server");
@@ -60,6 +62,12 @@ int main(int argc, char* argv[])
     }
     else if (print->parsed()) {
         //printDriver();
+    }
+    else if (kill->parsed()) {
+        killDeamon(driverPort);
+    }
+    else if (awake->parsed()) {
+
     }
 }
 

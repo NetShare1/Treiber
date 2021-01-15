@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="KillDeamon.cpp" />
     <ClCompile Include="NetShareCLI.cpp" />
     <ClCompile Include="Socket.cpp" />
     <ClCompile Include="startDriver.cpp" />
@@ -151,6 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CLI11.hpp" />
+    <ClInclude Include="killDeamon.h" />
     <ClInclude Include="Socket.h" />
     <ClInclude Include="startDriver.h" />
     <ClInclude Include="stopDriver.h" />
