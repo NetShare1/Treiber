@@ -12,7 +12,7 @@ int runConfigurationWorker()
 {
 	SocketServer in(5260, 3);
 
-    Log(WINTUN_LOG_INFO, L"Listening for connections");
+    NS_LOG_APP_INFO("Listening for connections");
 
     while (1) {
         Socket* s = in.Accept();
@@ -27,7 +27,7 @@ int runConfigurationWorker()
 unsigned __stdcall Answer(void* a) {
     Socket* s = (Socket*)a;
 
-    Log(WINTUN_LOG_INFO, L"New configuration connection established");
+    NS_LOG_APP_INFO("New configuration connection established");
 
     ConfigurationWorker worker{ s };
 
@@ -41,7 +41,7 @@ unsigned __stdcall Answer(void* a) {
 ConfigurationWorker::ConfigurationWorker(Socket* asocket)
     : socket{ asocket }
 {
-    Log(WINTUN_LOG_INFO, L"New configuration connection established");
+    NS_LOG_APP_INFO("New configuration connection established");
 }
 
 
@@ -290,7 +290,7 @@ void ConfigurationWorker::run()
     while (running) {
         std::string r = socket->ReceiveLine();
         if (r.empty()) break;
-        DLOG(WINTUN_LOG_INFO, L"New message recieved: %S", r.c_str());
+        NS_LOG_APP_INFO("New message recieved: {}", r);
         parseMessage(r);
     }
 }

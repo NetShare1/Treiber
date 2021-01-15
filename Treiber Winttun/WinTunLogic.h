@@ -7,11 +7,16 @@
 #include "diagnostics.h"
 #include "WorkPacket.h"
 #include "minitrace.h"
+#include "utils.h"
+
+#define NS_WINTUN_RECEIVE_LOG_NAME "wintun-receiver"
+#define NS_WINTUN_SEND_LOG_NAME "wintun-sender"
 
 static DWORD WINAPI
 ReceivePackets(_Inout_ std::shared_ptr<Config> conf)
 {
     MTR_META_THREAD_NAME("Wintun Receive Thread");
+    NS_CREATE_WORKER_LOGGER(NS_WINTUN_RECEIVE_LOG_NAME, ns::log::trace);
     WINTUN_SESSION_HANDLE Session = conf->sessionHandle;
     HANDLE WaitHandles[] = { WintunGetReadWaitEvent(Session), conf->quitEvent };
     int runFor = 11;
@@ -25,9 +30,9 @@ ReceivePackets(_Inout_ std::shared_ptr<Config> conf)
             {
                 MTR_SCOPE("Wintun_receive", "Processing packet");
                 // NS_PRINT_PACKET(Packet, PacketSize);
-                DLOG(
-                    WINTUN_LOG_INFO,
-                    L"[-1] Recieved Packet on WintunAdpater with length %d",
+                NS_LOG_TRACE(
+                    NS_WINTUN_RECEIVE_LOG_NAME,
+                    "Recieved Packet on WintunAdpater with length {}",
                     PacketSize
                 );
 
@@ -55,21 +60,26 @@ ReceivePackets(_Inout_ std::shared_ptr<Config> conf)
                     }
                     continue;
                 }
-                    Log(WINTUN_LOG_WARN, L"WinTun controller shutting down");
+                    NS_LOG_WARN(NS_WINTUN_RECEIVE_LOG_NAME, "WinTun controller shutting down");
                     return ERROR_SUCCESS;
                 default:
-                    LogError(L"Packet read failed", LastError);
+                    NS_LOG_ERROR(NS_WINTUN_RECEIVE_LOG_NAME, "Packet read failed: {}", GetLastErrorAsString());
                     return LastError;
                 }
             }   
         }
     }
     catch (const std::exception& e) {
-        LogError(L"An Error accoured in the WinTun Driver code: ", (DWORD)e.what());
+        NS_LOG_ERROR(
+            NS_WINTUN_RECEIVE_LOG_NAME, 
+            "An Error accoured in the WinTun Driver code: {}",
+            e.what()
+        );
         return 23512;
     }
 
-    Log(WINTUN_LOG_INFO, L"Wintun Receiving Worker shutdown");
+    NS_LOG_INFO(NS_WINTUN_RECEIVE_LOG_NAME, "Shutting down");
+
     return ERROR_SUCCESS;
 }
 
@@ -78,6 +88,7 @@ static DWORD WINAPI
 SendPackets(_Inout_ std::shared_ptr<Config> conf)
 {
     MTR_META_THREAD_NAME("Wintun Send Thread");
+    NS_CREATE_WORKER_LOGGER(NS_WINTUN_SEND_LOG_NAME, ns::log::trace);
     WINTUN_SESSION_HANDLE Session = conf->sessionHandle;
     HANDLE WaitHandles[] = { conf->quitEvent };
 
@@ -103,23 +114,30 @@ SendPackets(_Inout_ std::shared_ptr<Config> conf)
                     );
 
                     WintunSendPacket(conf->sessionHandle, sendingPacket);
-                    DLOG(
-                        WINTUN_LOG_INFO,
-                        L"[-2] Sending Packet on WintunAdpater with length %d",
-                        internalPacket[i]->packetSize
+                    NS_LOG_TRACE(
+                        NS_WINTUN_SEND_LOG_NAME,
+                        "Sending Packet on WintunAdpater with length {}",
+                        std::to_string(internalPacket[i]->packetSize)
                     );
                     conf->stats.tunPacketSent();
                 }
-                else if (GetLastError() != ERROR_BUFFER_OVERFLOW)
-                    return LogLastError(L"[-2] Packet write failed");
+                else if (GetLastError() != ERROR_BUFFER_OVERFLOW) {
+                    NS_LOG_ERROR(NS_WINTUN_SEND_LOG_NAME, "Packet write failed: {}", GetLastErrorAsString());
+                }
+
             }
             delete[] internalPacket;
         }
     }
     catch (const std::exception& e) {
-        LogError(L"An Error accoured in the WinTun Driver code: ", (DWORD)e.what());
+        NS_LOG_ERROR(
+            NS_WINTUN_SEND_LOG_NAME,
+            "An Error accoured in the WinTun Driver code: {}",
+            e.what()
+        );
         return 23512;
     }
-    Log(WINTUN_LOG_INFO, L"Wintun Sending Worker shutdown");
+    NS_LOG_INFO(NS_WINTUN_SEND_LOG_NAME, "Shutting down");
+
     return ERROR_SUCCESS;
 }

@@ -3,7 +3,12 @@
 #include <netioapi.h>
 
 #include "wintun.h"
+#include "init_wintun.h"
 #include "log.h"
+#include "diagnostics.h"
+#include "utils.h"
+
+#include <sstream>
 
 
 #pragma comment(lib, "iphlpapi.lib")
@@ -21,14 +26,11 @@ static WINTUN_ADAPTER_HANDLE getAdapterHandle(
     adapterHandle = WintunOpenAdapter(poolName, adapterName);
 
     // TODO: Make better log with information for adapterName and poolName
-    Log(
-        WINTUN_LOG_INFO,
-        L"Trying to get handle of Adapter"
-    );
+    NS_LOG_APP_DEBUG("Trying to get handle of Adapter");
 
     if (adapterHandle == NULL) {
         // adapter does not exist
-        Log(WINTUN_LOG_WARN, L"Adapter does not exist yet will create on: " + GetLastError());
+        NS_LOG_APP_WARN("Adapter does not exist yet. will create on: {}", GetLastErrorAsString());
 
         GUID guid;
 
@@ -40,14 +42,14 @@ static WINTUN_ADAPTER_HANDLE getAdapterHandle(
         );
 
         if (adapterHandle == NULL) {
-            LogLastError(L"Failed to create adapter Handle");
+            NS_LOG_APP_ERROR("Failed to create adapter Handle");
             return NULL;
         }
 
-        Log(WINTUN_LOG_INFO, L"Sucessfully create Adapter");
+        NS_LOG_APP_DEBUG("Sucessfully create Adapter");
     }
 
-    Log(WINTUN_LOG_INFO, L"Got Adapter handle");
+    NS_LOG_APP_DEBUG("Got Adapter handle");
 
     return adapterHandle;
 }
@@ -71,8 +73,10 @@ static void setIPAddress(
     DWORD LastError = CreateUnicastIpAddressEntry(&AddressRow);
     if (LastError != ERROR_SUCCESS && LastError != ERROR_OBJECT_ALREADY_EXISTS)
     {
-        LogError(L"Failed to set IP address", LastError);
+        std::ostringstream os;
+        os << LastError;
+        NS_LOG_APP_CRITICAL("Failed to set IP address: {}", os.str());
     }
 
-    Log(WINTUN_LOG_INFO, L"Set Ip Adress to: %i.%i.%i.%i/%i", ipp1, ipp2, ipp3, ipp4, subnetbits);
+    NS_LOG_APP_DEBUG("Set Ip Adress to: {}.{}.{}.{}/{}", ipp1, ipp2, ipp3, ipp4, subnetbits);
 }

@@ -13,7 +13,7 @@ void Workqueue::push(WorkPacket* workPacket) {
 
     // if the last packet is on the end of the buffer
     if (!ableToInputPacket()) {
-        Log(WINTUN_LOG_WARN, L"[WORKQUEUE]: Buffer full dropping packet");
+        NS_LOG_APP_WARN("Buffer full dropping packet");
         delete workPacket;
         return;
     }

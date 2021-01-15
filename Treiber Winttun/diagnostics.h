@@ -4,18 +4,6 @@
 
 #include "minitrace.h"
 
-#ifndef NDEBUG // if in debug
-
-#define NS_DEBUG
-
-#define DLOG Log
-
-#else // if in debug
-
-#define DLOG
-
-#endif // NS_DEBUG
-
 #include <thread>
 #include <chrono>
 #include <future>
@@ -26,6 +14,7 @@ class Statistics {
 public:
 
     Statistics() {
+        NS_CREATE_WORKER_LOGGER("statistics", ns::log::trace);
         statsCalcuatorThread = new std::thread([this]() {
             MTR_META_THREAD_NAME("Statistics Calculator Thread");
             this->calculateStats();
@@ -33,13 +22,14 @@ public:
     }
 
     ~Statistics() {
+
         shutdown();
     }
 
     void shutdown() {
         std::lock_guard<std::mutex> lck{ m };
         if (isRunning) {
-            Log(WINTUN_LOG_INFO, L"Shutting down Statistics");
+            NS_LOG_DEBUG("statistics", "Shutting down Statistics");
             exitSignal.set_value();
             statsCalcuatorThread->join();
             delete statsCalcuatorThread;
@@ -120,16 +110,16 @@ public:
                 maxSentThroughput = bitsSentLastSecond;
             }
 
-            Log(WINTUN_LOG_INFO, L"sending=%d Bits/Second", bitsSentLastSecond);
-            Log(WINTUN_LOG_INFO, L"receiving=%d Bits/Second", bitsRecievedLastSecond);
-            Log(WINTUN_LOG_INFO, L"max sending=%d Bits/Second", maxSentThroughput);
-            Log(WINTUN_LOG_INFO, L"max receiving=%d Bits/Second", maxRecieveThroughput);
-            Log(WINTUN_LOG_INFO, L"bits sent=%d", bitsSentOverall);
-            Log(WINTUN_LOG_INFO, L"bits received=%d", bitsRecievedOverall);
+            NS_LOG_INFO("statistics", "sending...       {} Bits/Second", bitsSentLastSecond);
+            NS_LOG_INFO("statistics", "receiving...     {} Bits/Second", bitsRecievedLastSecond);
+            NS_LOG_INFO("statistics", "max sending...   {} Bits/Second", maxSentThroughput);
+            NS_LOG_INFO("statistics", "max receiving... {} Bits/Second", maxRecieveThroughput);
+            NS_LOG_INFO("statistics", "bits sent...     {}", bitsSentOverall);
+            NS_LOG_INFO("statistics", "bits received... {}", bitsRecievedOverall);
 
             operatingSeconds++;
         }
-        DLOG(WINTUN_LOG_INFO, L"Shutting down Calc thread");
+        NS_LOG_DEBUG("statistics", "Shutting down Calc thread");
     }
 
 private:

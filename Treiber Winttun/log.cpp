@@ -6,94 +6,87 @@
 
 #include <string>
 
-
 namespace ns {
 
     namespace log {
 
 #ifdef NS_USE_CONSOLE
-        static std::shared_ptr<spdlog::sinks::stdout_color_sink_mt> gConsoleLogger;
+        std::shared_ptr<spdlog::sinks::stdout_color_sink_mt> gConsoleSink;
 #endif
 
-        static void initLog(LogLevel aLogLevel) {
+
+        void initLog(LogLevel aLogLevel) {
+            spdlog::level::level_enum logLevel = getSPDLogLevel(aLogLevel);
 #ifdef NS_USE_CONSOLE
 
-            gConsoleLogger = std::make_shared<spdlog::sinks::stdout_color_sink_mt>("console");
-            gConsoleLogger->set_pattern(NS_CONSOLE_LOG_PATTERN);
+            gConsoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+            gConsoleSink->set_pattern(NS_CONSOLE_LOG_PATTERN);
 
-            switch (aLogLevel)
-            {
-            case ns::log::trace:
-                gConsoleLogger->set_level(spdlog::level::trace);
-                break;
-            case ns::log::debug:
-                gConsoleLogger->set_level(spdlog::level::debug);
-                break;
-            case ns::log::info:
-                gConsoleLogger->set_level(spdlog::level::info);
-                break;
-            case ns::log::warn:
-                gConsoleLogger->set_level(spdlog::level::warn);
-                break;
-            case ns::log::error:
-                gConsoleLogger->set_level(spdlog::level::err);
-                break;
-            case ns::log::critical:
-                gConsoleLogger->set_level(spdlog::level::critical);
-                break;
-            default:
-                break;
-            }
+
+            gConsoleSink->set_level(logLevel);
 
 #endif
             std::string logLocation = NS_LOG_BASE_DIR;
             logLocation.append("app.nslog");
 
-            std::string appName = "app";
-#ifdef NS_USE_CONSOLE
-            appName = "app_sink";
-#endif
-
-            auto appLogger = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
-                appName,
+            auto appSink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
                 logLocation,
                 NS_WORKER_LOG_FILE_MAX_SIZE,
                 NS_WORKER_LOG_FILE_MAX_NUMBER
             );
 
-            appLogger->set_pattern(NS_APP_LOG_PATTERN);
+            appSink->set_pattern(NS_APP_LOG_PATTERN);
 
-            switch (aLogLevel)
-            {
-            case ns::log::trace:
-                appLogger->set_level(spdlog::level::trace);
-                break;
-            case ns::log::debug:
-                appLogger->set_level(spdlog::level::debug);
-                break;
-            case ns::log::info:
-                appLogger->set_level(spdlog::level::info);
-                break;
-            case ns::log::warn:
-                appLogger->set_level(spdlog::level::warn);
-                break;
-            case ns::log::error:
-                appLogger->set_level(spdlog::level::err);
-                break;
-            case ns::log::critical:
-                appLogger->set_level(spdlog::level::critical);
-                break;
-            default:
-                break;
-            }
+            appSink->set_level(logLevel);
+
+            std::string witnunLogLocation = NS_LOG_BASE_DIR;
+            witnunLogLocation.append("wintun/wintun.nslog");
+
+            auto wintunSink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
+                // "wintun",
+                witnunLogLocation,
+                NS_WORKER_LOG_FILE_MAX_SIZE,
+                NS_WORKER_LOG_FILE_MAX_NUMBER
+            );
+
+            wintunSink->set_pattern(NS_WINTUN_LOG_PATTERN);
+
+            wintunSink->set_level(logLevel);
+
+            std::vector<spdlog::sink_ptr> appSinks;
+            std::vector<spdlog::sink_ptr> wintunSinks;
 
 #ifdef NS_USE_CONSOLE
-            spdlog::logger logger("app", { appLogger, gConsoleLogger });
+            appSinks.push_back(appSink);
+            appSinks.push_back(gConsoleSink);
+
+            wintunSinks.push_back(wintunSink);
+            wintunSinks.push_back(gConsoleSink);
+
+#elif
+            appSinks.push_back(appSink);
+
+            wintunSinks.push_back(wintunSink);
 #endif
-            
+
+            auto appLogger = std::make_shared<spdlog::logger>(
+                "app",
+                std::begin(appSinks),
+                std::end(appSinks)
+            );
+            auto wintunLogger = std::make_shared<spdlog::logger>(
+                "wintun",
+                std::begin(wintunSinks),
+                std::end(wintunSinks)
+            );
+
+            appLogger->set_level(logLevel);
+            wintunLogger->set_level(logLevel);
+            spdlog::register_logger(appLogger);
+            spdlog::register_logger(wintunLogger);
         }
 
-        static void createWorkerLogger(std::string aLoggerName, LogLevel aLogLevel) {
+        void createWorkerLogger(std::string aLoggerName, LogLevel aLogLevel) {
             std::string logLocation = NS_LOG_BASE_DIR;
             logLocation.append("workers/");
             logLocation.append(aLoggerName);
@@ -101,47 +94,78 @@ namespace ns {
             logLocation.append(aLoggerName);
             logLocation.append(".nslog");
 
-            std::string loggerName = aLoggerName;
-#ifdef NS_USE_CONSOLE
-            loggerName.append("_sink");
-#endif
-
-            auto logger = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
-                aLoggerName,
+            auto fileSink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
                 logLocation,
                 NS_WORKER_LOG_FILE_MAX_SIZE,
                 NS_WORKER_LOG_FILE_MAX_NUMBER
             );
 
-            logger->set_pattern(NS_WORKER_LOG_PATTERN);
+            fileSink->set_pattern(NS_WORKER_LOG_PATTERN);
             
-            switch (aLogLevel)
+            fileSink->set_level(getSPDLogLevel(aLogLevel));
+
+            std::vector<spdlog::sink_ptr> wSinks;
+
+#ifdef NS_USE_CONSOLE
+            wSinks.push_back(fileSink);
+            wSinks.push_back(gConsoleSink);
+
+#elif
+            wSinks.push_back(fileSink);
+#endif
+
+            auto wLogger = std::make_shared<spdlog::logger>(
+                aLoggerName,
+                std::begin(wSinks),
+                std::end(wSinks)
+            );
+            wLogger->set_level(getSPDLogLevel(aLogLevel));
+            try {
+                spdlog::register_logger(wLogger);
+            }
+            catch (spdlog::spdlog_ex& err) {
+                NS_LOG_APP_WARN("Logger already exists dropping new one");
+            }
+        }
+
+
+        void CALLBACK WintunLoggerFunc(_In_ WINTUN_LOGGER_LEVEL Level, _In_z_ const WCHAR* LogLine) {
+            std::wstring ws(LogLine);
+            std::string str(ws.begin(), ws.end());
+            switch (Level)
             {
-            case ns::log::trace:
-                logger->set_level(spdlog::level::trace);
+            case WINTUN_LOG_INFO:
+                spdlog::get("wintun")->info(str);
                 break;
-            case ns::log::debug:
-                logger->set_level(spdlog::level::debug);
+            case WINTUN_LOG_WARN:
+                spdlog::get("wintun")->warn(str);
                 break;
-            case ns::log::info:
-                logger->set_level(spdlog::level::info);
-                break;
-            case ns::log::warn:
-                logger->set_level(spdlog::level::warn);
-                break;
-            case ns::log::error:
-                logger->set_level(spdlog::level::err);
-                break;
-            case ns::log::critical:
-                logger->set_level(spdlog::level::critical);
+            case WINTUN_LOG_ERR:
+                spdlog::get("wintun")->error(str);
                 break;
             default:
                 break;
             }
+        }
 
-#ifdef NS_USE_CONSOLE
-            spdlog::logger logger(aLoggerName, { logger, gConsoleLogger });
-#endif
+        spdlog::level::level_enum getSPDLogLevel(LogLevel level) {
+            switch (level)
+            {
+            case ns::log::trace:
+                return spdlog::level::trace;
+            case ns::log::debug:
+                return spdlog::level::debug;
+            case ns::log::info:
+                return spdlog::level::info;
+            case ns::log::warn:
+                return spdlog::level::warn;
+            case ns::log::error:
+                return spdlog::level::err;
+            case ns::log::critical:
+                return spdlog::level::critical;
+            default:
+                return spdlog::level::info;
+            }
         }
 
     }

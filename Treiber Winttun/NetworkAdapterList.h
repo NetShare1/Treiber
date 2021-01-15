@@ -27,7 +27,7 @@ public:
 		pAdapterInfo = (IP_ADAPTER_INFO*)malloc(sizeof(IP_ADAPTER_INFO));
 
 		if (pAdapterInfo == NULL) {
-			Log(WINTUN_LOG_ERR, L"Error allocating memory needed to call GetAdaptersinfo\n");
+			NS_LOG_APP_ERROR("Error allocating memory needed to call GetAdaptersinfo");
 			return 1;
 		}
 
@@ -37,7 +37,7 @@ public:
 			free(pAdapterInfo);
 			pAdapterInfo = (IP_ADAPTER_INFO*)malloc(ulOutBufLen);
 			if (pAdapterInfo == NULL) {
-				Log(WINTUN_LOG_ERR, L"Error allocating memory needed to call GetAdaptersinfo\n");
+				NS_LOG_APP_ERROR("Error allocating memory needed to call GetAdaptersinfo");
 				return 1;
 			}
 		}
@@ -61,7 +61,7 @@ public:
 			// activateViable();
 		}
 		else {
-			Log(WINTUN_LOG_ERR, L"Error getting adapter infos");
+			NS_LOG_APP_ERROR("Error getting adapter infos");
 			return 1;
 		}
 	}
@@ -81,9 +81,8 @@ public:
 				}
 			}
 			(*it)->first = hasName;
-			DLOG(
-				WINTUN_LOG_INFO,
-				L"Using adapter %S ? %S",
+			NS_LOG_APP_DEBUG(
+				"Using adapter {} ? {}",
 				(*it)->second->Desc,
 				hasName ? "true" : "false"
 			);
@@ -148,7 +147,7 @@ private:
 			// holy s*** this is ugly
 			if (*((*it)->second->IpAdress) != zeroAdress) {
 				(*it)->first = true;
-				Log(WINTUN_LOG_INFO, L"Using Adapter as proxy: %S", (*it)->second->Desc);
+				NS_LOG_APP_INFO("Using Adapter as proxy: {}", (*it)->second->Desc);
 			}
 		}
 	}
@@ -162,7 +161,7 @@ private:
 #else
 		bool viable = *(adapter->IpAdress) != zeroAdress;
 		if (!viable) {
-			Log(WINTUN_LOG_INFO, L"Adapter %S is not viable because it has a zero adress", adapter->Desc);
+			NS_LOG_APP_DEBUG("Adapter {} is not viable because it has a zero adress", adapter->Desc);
 		}
 		return viable;
 #endif // NS_DEBUG

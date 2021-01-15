@@ -3,11 +3,14 @@
 #include "WinTunLogic.h"
 #include "utils.h"
 
+#include "log.h"
+
 void Application::run()
 {
     conf->isRunning = true;
 
     numberOfWorkers = udpconfigs->size() + 2;
+    NS_LOG_APP_TRACE("Creating a total of {} worker threads", numberOfWorkers);
 
     Workers = new HANDLE[numberOfWorkers]();
 
@@ -17,7 +20,7 @@ void Application::run()
     Workers[0] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ReceivePackets, (LPVOID)&wintunReceiveConf, 0, NULL);
     Workers[1] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)SendPackets, (LPVOID)&wintunSendConf, 0, NULL);
     for (int i = 2; i < numberOfWorkers; i++) {
-        DLOG(WINTUN_LOG_INFO, L"Starting Thread %d", i);
+        NS_LOG_APP_DEBUG("Starting Thread {}", i);
         Workers[i] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)WorkSocket, (LPVOID)&udpconfigs->at(i - 2), 0, NULL);
     }
 
@@ -26,15 +29,15 @@ void Application::run()
 
     if (SetConsoleCtrlHandler(CtrlHandler, TRUE))
     {
-        Log(WINTUN_LOG_INFO, L"The Control Handler is installed.");
+        NS_LOG_APP_INFO("The Control Handler is installed.");
     }
     else
     {
-        Log(WINTUN_LOG_ERR, L"ERROR: Could not set control handler");
+        NS_LOG_APP_CRITICAL("Could not set control handler");
         shutdown();
     }
 
-    LOG(WINTUN_LOG_INFO, L"Started up workers");
+    NS_LOG_APP_INFO("Start sucessful");
 
     atexit(nsShutdown);
 
@@ -59,7 +62,7 @@ bool Application::initRun()
     std::ifstream file(confFilePath, std::ios::in | std::ios::binary);
     if (!file.is_open()) {
         std::ofstream outFile(confFilePath, std::ios::out | std::ios::binary);
-        Log(WINTUN_LOG_WARN, L"File does not exist creating default one");
+        NS_LOG_APP_WARN("Internal config file does not exist creating default one");
         internalConfig->adapterIp.ipp1 = 10;
         internalConfig->adapterIp.ipp2 = 0;
         internalConfig->adapterIp.ipp3 = 0;
@@ -82,10 +85,11 @@ bool Application::initRun()
         outFile.close();
     }
     try {
+        NS_LOG_APP_TRACE("Reading internal config");
         internalConfig->read(file);
     }
     catch (...) {
-        Log(WINTUN_LOG_ERR, L"Error reading config file");
+        NS_LOG_APP_ERROR("Error reading config file");
         return false;
     }
     file.close();
@@ -102,14 +106,14 @@ bool Application::initRun()
 
     HMODULE Wintun = InitializeWintun();
     if (!Wintun) {
-        LogError(L"Failed to initialize Wintun", GetLastError());
+        NS_LOG_APP_ERROR("Failed to initialize Wintun: {}", GetLastErrorAsString());
         exited = true;
         startingUp = false;
         return false;
     }
-    DLOG(WINTUN_LOG_INFO, L"Sucessfully loaded wintun dll");
+    NS_LOG_APP_DEBUG("Sucessfully loaded wintun dll");
 
-    WintunSetLogger(ConsoleLogger);
+    WintunSetLogger(ns::log::WintunLoggerFunc);
 
     adapterList = new NetworkAdapterList();
     adapterList->init();
@@ -126,7 +130,7 @@ bool Application::initRun()
         getAdapterHandle(L"Netshare", L"Netshare ADP1");
 
     if (conf->adapterHandle == NULL) {
-        LogLastError(L"Failed to start adapter handle:");
+        NS_LOG_APP_ERROR("Failed to start adapter handle: {}", GetLastErrorAsString());
 
         exited = true;
         startingUp = false;
@@ -150,17 +154,17 @@ bool Application::initRun()
         );
 
     if (!conf->sessionHandle) {
-        LogLastError(L"Failed to start session");
+        NS_LOG_APP_ERROR("Failed to start session: {}", GetLastErrorAsString());
         WintunFreeAdapter(conf->adapterHandle);
-        Log(WINTUN_LOG_INFO, L"Freed Adapter");
+        NS_LOG_APP_DEBUG("Freed Adapter again");
         exited = true;
         startingUp = false;
         return false;
     }
 
-    DLOG(WINTUN_LOG_INFO, L"Successfully started Session");
+    NS_LOG_APP_DEBUG("Successfully started Session");
 
-    DLOG(WINTUN_LOG_INFO, L"Sucessfully inited");
+    NS_LOG_APP_INFO("Sucessfully inited");
 }
 
 void Application::shutdown()
@@ -168,52 +172,51 @@ void Application::shutdown()
     if (exited) {
         return;
     }
-    Log(WINTUN_LOG_INFO, L"Messages Recieved on tun device: %d", conf->stats.getTunPacketsRecieved());
-    Log(WINTUN_LOG_INFO, L"Messages Sent on tun device: %d", conf->stats.getTunPacketsSent());
-    Log(WINTUN_LOG_INFO, L"Messages Recieved on udp sockets: %d", conf->stats.getUdpPacketsRecieved());
-    Log(WINTUN_LOG_INFO, L"Messages Sent on udp sockets: %d", conf->stats.getUdpPacketsSent());
+    NS_LOG_APP_INFO("Messages Recieved on tun device:  {}", conf->stats.getTunPacketsRecieved());
+    NS_LOG_APP_INFO("Messages Sent on tun device:      {}", conf->stats.getTunPacketsSent());
+    NS_LOG_APP_INFO("Messages Recieved on udp sockets: {}", conf->stats.getUdpPacketsRecieved());
+    NS_LOG_APP_INFO("Messages Sent on udp sockets:     {}", conf->stats.getUdpPacketsSent());
     conf->stats.shutdown();
     exited = true;
-    Log(WINTUN_LOG_INFO, L"Shutting down");
+    NS_LOG_APP_DEBUG("Shutting down");
     conf->isRunning = false;
     SetEvent(conf->quitEvent);
 
     conf->sendingPacketQueue->releaseAll();
     conf->recievingPacketQueue->releaseAll();
-    DLOG(
-        WINTUN_LOG_INFO,
-        L"Release all blocks"
-    );
-    Log(WINTUN_LOG_INFO, L"Workers shut down");
+    NS_LOG_APP_TRACE("Release all blocks");
 
     clearWorkers();
+    NS_LOG_APP_DEBUG("Workers shut down");
 
     closeSockets(udpconfigs);
+    NS_LOG_APP_DEBUG("Sockets closed");
 
     shutdownWSA();
 
     WintunEndSession(conf->sessionHandle);
-    Log(WINTUN_LOG_INFO, L"Ended Session");
+    NS_LOG_APP_DEBUG("Ended Wintun Session");
 
     WintunFreeAdapter(conf->adapterHandle);
-    Log(WINTUN_LOG_INFO, L"Freed Adapter");
+    NS_LOG_APP_DEBUG("Freed Wintun Adapter");
 
     CloseHandle(conf->quitEvent);
 
     shutdownProfiling();
-    Log(WINTUN_LOG_INFO, L"Shutdown successful");
+    NS_LOG_APP_TRACE("Shutted down profilling");
 
     conf = nullptr;
     wintunReceiveConf = nullptr;
     wintunSendConf = nullptr;
     delete udpconfigs;
+    NS_LOG_APP_INFO("Shutdown successful");
 }
 
 void Application::init(std::string confFilePath)
 {
-    configThread = new std::thread(runConfigurationWorker);
-
     this->confFilePath = confFilePath;
+
+    configThread = new std::thread(runConfigurationWorker);
 
     configThread->join();
 }
@@ -228,7 +231,7 @@ void Application::initProfiling()
 #ifdef NS_PERF_PROFILE
     metricsThread = new std::thread([]() {
         std::this_thread::sleep_for(std::chrono::seconds(1));
-        Log(WINTUN_LOG_INFO, L"Flushing");
+        NS_LOG_APP_TRACE("Flushing");
         mtr_flush();
     });
 #endif
@@ -249,6 +252,7 @@ std::shared_ptr<Config> Application::createConfigFromFile(std::string file)
     std::shared_ptr<Config> conf{new Config()};
     std::string line;
     std::ifstream infile(file);
+    NS_LOG_APP_DEBUG("Starting to create config from config file: {}", file);
     while (std::getline(infile, line))
     {
         addConfParameter(line, conf);
@@ -261,9 +265,14 @@ void Application::addConfParameter(std::string value, _Inout_ std::shared_ptr<Co
     // remove all whitespace left and right
     trim(value);
     // skip comments and empty space
+    
+    NS_LOG_APP_TRACE("Parsing file line: {}", value);
+
     if (value.empty() || value.at(0) == '#') {
+        NS_LOG_APP_TRACE("Ignoring line. Ether empty or a comment");
         return;
     }
+
 
     std::string delimiter = "=";
     std::string key = value.substr(0, value.find(delimiter));
@@ -271,48 +280,75 @@ void Application::addConfParameter(std::string value, _Inout_ std::shared_ptr<Co
     
     if (key.compare("ADAPTER_IP") == 0) {
         try {
+            NS_LOG_APP_TRACE("Line is to set a ip address of the wintun adapter. Trying to parse: {}", value);
             conf->winTunAdapterIpv4Adress = *(parseIpString(value));
+            NS_LOG_APP_DEBUG(
+                "Successfully parse the ip address. Ip adress of adapter is now: {}.{}.{}.{}",
+                conf->winTunAdapterIpv4Adress.ipp1,
+                conf->winTunAdapterIpv4Adress.ipp2,
+                conf->winTunAdapterIpv4Adress.ipp3,
+                conf->winTunAdapterIpv4Adress.ipp4
+            );
         }
         catch (...) {
-            Log(WINTUN_LOG_ERR, L"Error parsing Wintun Subnet bits port");
+            NS_LOG_APP_WARN("Error parsing IP Adress. {}", value);
         }
     }
     else  if (key.compare("ADAPTER_SUBNET_BITS") == 0) {
-        conf->winTunAdapterSubnetBits = atoi(value.c_str());
+        try {
+            NS_LOG_APP_TRACE("Line is to set a subnetbits of the wintun adapter. Trying to parse: {}", value);
+            conf->winTunAdapterSubnetBits = atoi(value.c_str());
+            NS_LOG_APP_DEBUG("Successfully parsed the subnet bits. Adapter has now {} subnetbits.", conf->winTunAdapterSubnetBits);
+        }
+        catch (...) {
+            NS_LOG_APP_WARN("Error parsing subnetbits: {}", value);
+        }
     }
     else if (key.compare("SERVER_IP") == 0) {
-        conf->serverIpv4Adress = *parseIpString(value);
+        try {
+            NS_LOG_APP_TRACE("Line is to set the servers ip adress. Trying to parse: {}", value);
+            conf->serverIpv4Adress = *parseIpString(value);
+            NS_LOG_APP_DEBUG(
+                "Successfully parsed server ip adress. Server ip is now: {}.{}.{}.{}",
+                conf->serverIpv4Adress.ipp1,
+                conf->serverIpv4Adress.ipp2,
+                conf->serverIpv4Adress.ipp3,
+                conf->serverIpv4Adress.ipp4
+            );
+        }
+        catch (...) {
+            NS_LOG_APP_WARN("Error parsing server ip address: {}", value);
+        }
     }
     else if (key.compare("SERVER_PORT") == 0) {
         try {
+            NS_LOG_APP_TRACE("Line is to set  the port of the server. Trying to parse: {}", value);
             conf->serverPort = atoi(value.c_str());
+            NS_LOG_APP_DEBUG("Sucessfully parsed the servers port. Server port is now: {}", conf->serverPort);
         }
         catch (...) {
-            Log(WINTUN_LOG_ERR, L"Error parsing Server port");
+            NS_LOG_APP_WARN("Error parsing Server port: {}", value);
         }
     }
     else if (key.compare("ADAPTER_NAME") == 0) {
         adapterNames->push_back(value);
+        NS_LOG_APP_DEBUG("Added adapter name to adapter list: {}", value);
     }
     else {
-        Log(WINTUN_LOG_WARN, L"Unknown key: %S", key);
+        NS_LOG_APP_WARN("Unknown key: {}", key);
     }
 }
 
 void Application::clearWorkers()
 {
-    DLOG(WINTUN_LOG_INFO, L"Shutting down Workers");
+    NS_LOG_APP_DEBUG("Shutting down Workers");
     for (size_t i = 0; i < numberOfWorkers; ++i)
     {
         if (Workers[i])
         {
             WaitForSingleObject(Workers[i], INFINITE);
             CloseHandle(Workers[i]);
-            DLOG(
-                WINTUN_LOG_INFO,
-                L"Closed Worker %d",
-                i
-            );
+            NS_LOG_APP_TRACE("Closed Worker {}", i);
         }
     }
 
@@ -325,26 +361,26 @@ BOOL Application::handleCtrlSignal(DWORD signal)
     {
         // Handle the CTRL-C signal.
     case CTRL_C_EVENT:
-        Log(WINTUN_LOG_INFO, L"Ctrl-C event");
+        NS_LOG_APP_INFO("Ctrl-C event");
         exit(EXIT_SUCCESS);
         return TRUE;
 
         // CTRL-CLOSE: confirm that the user wants to exit.
     case CTRL_CLOSE_EVENT:
-        Log(WINTUN_LOG_INFO, L"Ctrl-Close event");
+        NS_LOG_APP_INFO("Ctrl-Close event");
         return TRUE;
 
         // Pass other signals to the next handler.
     case CTRL_BREAK_EVENT:
-        Log(WINTUN_LOG_INFO, L"Ctrl-Break event");
+        NS_LOG_APP_INFO("Ctrl-Break event");
         return FALSE;
 
     case CTRL_LOGOFF_EVENT:
-        Log(WINTUN_LOG_INFO, L"Ctrl-Logoff event");
+        NS_LOG_APP_INFO("Ctrl-Logoff event");
         return FALSE;
 
     case CTRL_SHUTDOWN_EVENT:
-        Log(WINTUN_LOG_INFO, L"Ctrl-Shutdown event");
+        NS_LOG_APP_INFO("Ctrl-Shutdown event");
         shutdown();
         return FALSE;
 

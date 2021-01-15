@@ -16,7 +16,9 @@ int initSocket(std::shared_ptr<UDPWorkerConfig> conf) {
 			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 			(LPWSTR)&s, 0, NULL
 		);
-		Log(WINTUN_LOG_ERR, L"Error trying to start WSA: %d", s);
+		std::wstring ws(s);
+		std::string str(ws.begin(), ws.end());
+		NS_LOG_APP_CRITICAL("Error trying to start WSA: {}", str);
 		LocalFree(s);
 		return -1;
 	}
@@ -31,7 +33,9 @@ int initSocket(std::shared_ptr<UDPWorkerConfig> conf) {
 			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 			(LPWSTR)&s, 0, NULL
 		);
-		Log(WINTUN_LOG_ERR, L"Error creating socket(): %s\n", s);
+		std::wstring ws(s);
+		std::string str(ws.begin(), ws.end());
+		NS_LOG_APP_CRITICAL("Error creating socket(): {}", str);
 		LocalFree(s);
 		// Clean up
 		WSACleanup();
@@ -61,7 +65,9 @@ int initSocket(std::shared_ptr<UDPWorkerConfig> conf) {
 			(LPWSTR)&s, 0, NULL
 		);
 
-		Log(WINTUN_LOG_ERR, L"Bind on socket failed! Error: %s.\n", s);
+		std::wstring ws(s);
+		std::string str(ws.begin(), ws.end());
+		NS_LOG_APP_CRITICAL("Bind on socket failed! Error: {}", str);
 
 		LocalFree(s);
 		// Close the socket
@@ -72,9 +78,8 @@ int initSocket(std::shared_ptr<UDPWorkerConfig> conf) {
 		return -1;
 	}
 
-	Log(
-		WINTUN_LOG_INFO,
-		L"Successfully binded socket on %d.%d.%d.%d:%d",
+	NS_LOG_APP_DEBUG(
+		"Successfully binded socket on {}.{}.{}.{}:{}",
 		conf->socketIpv4Adress.ipp1,
 		conf->socketIpv4Adress.ipp2,
 		conf->socketIpv4Adress.ipp3,
@@ -85,20 +90,30 @@ int initSocket(std::shared_ptr<UDPWorkerConfig> conf) {
 	u_long mode = 1;
 	int res = ioctlsocket(conf->socket, FIONBIO, &mode);
 	if (res != NO_ERROR) {
-		Log(WINTUN_LOG_ERR, L"Error setting socket in nonblocking mode");
-	}
+		wchar_t* s = NULL;
+		FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL, WSAGetLastError(),
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+			(LPWSTR)&s, 0, NULL
+		);
 
-	/*struct timeval read_timeout;
-	read_timeout.tv_sec = 0;
-	read_timeout.tv_usec = 10;
-	setsockopt(conf->socket, SOL_SOCKET, SO_RCVTIMEO, (char*)&read_timeout, sizeof read_timeout);
-	setsockopt(conf->socket, SOL_SOCKET, SO_SNDTIMEO, (char*)&read_timeout, sizeof read_timeout);
-	*/
+		std::wstring ws(s);
+		std::string str(ws.begin(), ws.end());
+		NS_LOG_APP_CRITICAL("Bind on socket failed! Error: {}", str);
+
+		LocalFree(s);
+		// Close the socket
+		closesocket(conf->socket);
+		// Do the clean up
+		WSACleanup();
+		// and exit with error
+		return -1;
+	}
 }
 
 void closeSockets(std::vector<std::shared_ptr<UDPWorkerConfig>>* configs) {
 	MTR_SCOPE("Shutdown", __FUNCSIG__);
-	Log(WINTUN_LOG_INFO, L"Shutting down UDP Sockets");
+	NS_LOG_APP_DEBUG("Shutting down UDP Sockets");
 	for (int i = 0; i < configs->size(); i++) {
 		closesocket(configs->at(i)->socket);
 	}
@@ -115,6 +130,13 @@ int WorkSocket(std::shared_ptr<UDPWorkerConfig> conf) {
 	threadName += conf->reciever ? " [receiving]" : " [sending]";
 	MTR_META_THREAD_NAME(threadName.c_str());
 #endif
+
+	std::string loggerName = "udpworker-";
+	conf->reciever ? loggerName.append("receiver-") : loggerName.append("sender-");
+	loggerName.append(std::to_string(conf->uid));
+
+	NS_CREATE_WORKER_LOGGER(loggerName, ns::log::trace);
+
 
 	WSADATA wsaData;
 	SOCKET SendingSocket = conf->socket;
@@ -158,10 +180,9 @@ int WorkSocket(std::shared_ptr<UDPWorkerConfig> conf) {
 				MTR_END("UDP_Sending", "SendingPacket");
 				conf->conf->stats.udpPacketSent(packet[i]->packetSize);
 
-				DLOG(
-					WINTUN_LOG_INFO,
-					L"[%d] Sent Datagram to %d.%d.%d.%d:%d from %d.%d.%d.%d:%d with length: %d",
-					conf->uid,
+				NS_LOG_TRACE(
+					loggerName,
+					"Sent Datagram to {}.{}.{}.{}:{} from{}.{}.{}.{}:{} with length: {}",
 					conf->conf->serverIpv4Adress.ipp1,
 					conf->conf->serverIpv4Adress.ipp2,
 					conf->conf->serverIpv4Adress.ipp3,
@@ -172,7 +193,7 @@ int WorkSocket(std::shared_ptr<UDPWorkerConfig> conf) {
 					conf->socketIpv4Adress.ipp3,
 					conf->socketIpv4Adress.ipp4,
 					conf->socketPort,
-					packet[i]->packetSize
+					std::to_string(packet[i]->packetSize)
 				);
 
 				if (iResult == SOCKET_ERROR) {
@@ -189,9 +210,13 @@ int WorkSocket(std::shared_ptr<UDPWorkerConfig> conf) {
 						MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 						(LPWSTR)&s, 0, NULL
 					);
-					Log(WINTUN_LOG_WARN,
-						L"sendto failed with error: %s",
-						s
+
+					std::wstring ws(s);
+					std::string str(ws.begin(), ws.end());
+					NS_LOG_WARN(
+						loggerName,
+						"sendto failed with error: {}",
+						str
 					);
 					LocalFree(s);
 					return 2819;
@@ -205,12 +230,6 @@ int WorkSocket(std::shared_ptr<UDPWorkerConfig> conf) {
 		BYTE* buffer = new BYTE[NS_RECIEVE_BUFFER_SIZE]();
 
 		int remoteAdressLen = sizeof(RecvAddr);
-
-		/*const int runForConst = 10;
-		int runFor = runForConst; // run throughs until next wait
-		int currWaitTime = 10; // Wait time in miliseconds
-		int packetsReceivedCurr = 0;
-		int packetsReceivedLast = 0;*/
 
 		FD_SET readfds;
 		FD_SET writefds;
@@ -246,10 +265,12 @@ int WorkSocket(std::shared_ptr<UDPWorkerConfig> conf) {
 							MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 							(LPWSTR)&s, 0, NULL
 						);
-						Log(WINTUN_LOG_WARN,
-							L"[%d] slect failed with error: %s",
-							conf->uid,
-							s
+						std::wstring ws(s);
+						std::string str(ws.begin(), ws.end());
+						NS_LOG_WARN(
+							loggerName,
+							"select failed with error: {}",
+							str
 						);
 						LocalFree(s);
 						return 2820;
@@ -257,7 +278,7 @@ int WorkSocket(std::shared_ptr<UDPWorkerConfig> conf) {
 				}
 				else if (total == 0) {
 					if (!conf->conf->isRunning) {
-						DLOG(WINTUN_LOG_INFO, L"[%d] Shutting down Adapter", conf->uid);
+						NS_LOG_INFO(loggerName, "Shutting down Adapter");
 						break;
 					}
 					continue;
@@ -290,10 +311,9 @@ int WorkSocket(std::shared_ptr<UDPWorkerConfig> conf) {
 							break;
 						}
 
-						DLOG(
-							WINTUN_LOG_INFO,
-							L"[%d] Recieved Datagram from %d.%d.%d.%d:%d on %d.%d.%d.%d:%d with length: %d",
-							conf->uid,
+						NS_LOG_TRACE(
+							loggerName,
+							"Recieved Datagram from {}.{}.{}.{}:{} on {}.{}.{}.{}:{} with length: {}",
 							conf->conf->serverIpv4Adress.ipp1,
 							conf->conf->serverIpv4Adress.ipp2,
 							conf->conf->serverIpv4Adress.ipp3,
@@ -319,14 +339,17 @@ int WorkSocket(std::shared_ptr<UDPWorkerConfig> conf) {
 								MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 								(LPWSTR)&s, 0, NULL
 							);
-							Log(WINTUN_LOG_WARN,
-								L"recvfrom failed with error: %s",
-								s
+							std::wstring ws(s);
+							std::string str(ws.begin(), ws.end());
+							NS_LOG_WARN(
+								loggerName,
+								"recvfrom failed with error: {}",
+								str
 							);
 							LocalFree(s);
 							return 2820;
 						}
-						Log(WINTUN_LOG_WARN, L"[%d] Read reading buffer without any data init", conf->uid);
+						NS_LOG_WARN(loggerName, "Read reading buffer without any data init");
 					}
 
 				}
@@ -335,6 +358,6 @@ int WorkSocket(std::shared_ptr<UDPWorkerConfig> conf) {
 		delete[] buffer;
 	}
 
-	Log(WINTUN_LOG_INFO, L"Shutting down UDP Socket Worker %S", conf->reciever ? " [receiving]" : " [sending]");
+	NS_LOG_INFO(loggerName, "Shutting down UDP Socket Worker");
 	return ERROR_SUCCESS;
 }

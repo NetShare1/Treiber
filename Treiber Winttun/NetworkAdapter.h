@@ -30,9 +30,8 @@ public:
 		s = s.substr(s.find(".") + 1, s.length());
 		IpAdress->ipp4 = atoi(s.substr(0, s.length()).c_str());
 
-		DLOG(
-			WINTUN_LOG_INFO,
-			L"Added Adapter:\n   name: %S\n   desc: %S\n   IP: %d.%d.%d.%d",
+		NS_LOG_APP_DEBUG(
+			"Added Adapter:\n   name: {}\n   desc: {}\n   IP: {}.{}.{}.{}",
 			name,
 			desc,
 			IpAdress->ipp1,
