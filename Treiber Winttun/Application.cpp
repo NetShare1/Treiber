@@ -81,6 +81,8 @@ bool Application::initRun()
         internalConfig->names->push_back("{B6BBCC6F-E3F6-47AF-8869-B52D441F9AE8}");
         internalConfig->names->push_back("{251C104E-9987-4CB5-986F-C2CE287B4429}");
 
+        internalConfig->logLevel = ns::log::debug;
+
         internalConfig->write(outFile);
         outFile.close();
     }

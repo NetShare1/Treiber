@@ -63,7 +63,7 @@ namespace ns {
             wintunSinks.push_back(wintunSink);
             wintunSinks.push_back(gConsoleSink);
 
-#elif
+#else
             appSinks.push_back(appSink);
 
             wintunSinks.push_back(wintunSink);
@@ -110,7 +110,7 @@ namespace ns {
             wSinks.push_back(fileSink);
             wSinks.push_back(gConsoleSink);
 
-#elif
+#else
             wSinks.push_back(fileSink);
 #endif
 

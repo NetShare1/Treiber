@@ -9,6 +9,8 @@ void AppConfig::write(std::ofstream& file)
 	serverIp.write(file);
 	file.write((char*)&serverPort, sizeof(serverPort));
 
+	file.write((char*)&logLevel, sizeof(logLevel));
+
 	// write number of names
 	size_t numberOfNames = names->size();
 	file.write((char*)&numberOfNames, sizeof(numberOfNames));
@@ -24,6 +26,8 @@ void AppConfig::read(std::ifstream& file)
 
 	serverIp.read(file);
 	file.read((char*)&serverPort, sizeof(serverPort));
+
+	file.read((char*)&logLevel, sizeof(logLevel));
 
 	// write number of names
 	size_t numberOfNames;

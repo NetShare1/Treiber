@@ -4,6 +4,12 @@
 
 #endif
 
+#ifndef NS_USE_CONSOLE
+
+#pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"")
+
+#endif
+
 #include "Application.h"
 
 #include "CLI11.hpp"

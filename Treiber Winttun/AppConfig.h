@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Config.h"
+#include "log.h"
 
 #include <fstream>
 
@@ -12,6 +13,8 @@ public:
 
 	NsIpAddress serverIp;
 	int serverPort;
+
+	ns::log::LogLevel logLevel;
 
 	std::vector<std::string>* names;
 

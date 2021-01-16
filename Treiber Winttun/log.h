@@ -5,8 +5,6 @@
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 
-#define NS_USE_CONSOLE
-
 #define NS_WORKER_LOG_PATTERN "[%H:%M:%S.%f] [%L] [thread %t] %v"
 #define NS_CONSOLE_LOG_PATTERN "[%H:%M:%S.%f] [%n] [%^%=8l%$] [thread %t] %v"
 #define NS_APP_LOG_PATTERN "[%H:%M:%S.%f] [%L] [thread %t] %v"
