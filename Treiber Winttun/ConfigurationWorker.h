@@ -23,6 +23,8 @@ private:
 
 	void parseDriverStatePutMessage(rapidjson::Document& doc);
 
+	void parseConfigPutMessage(rapidjson::Document& doc);
+
 	void parseDeamonStatePutMessage(rapidjson::Document& doc);
 
 	std::string getErrorResponse(std::string errorMessage);
@@ -32,6 +34,8 @@ private:
 
 	std::string getDriverStateUpdate(std::string state);
 	std::string getDriverStateResponse(std::string state);
+
+	ns::log::LogLevel getLogLevelFromString(std::string logLevel);
 
 	bool running = true;
 

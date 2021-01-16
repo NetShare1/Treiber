@@ -65,6 +65,10 @@ public:
 		return instance;
 	}
 
+	std::string getConfigFilePath() {
+		return confFilePath;
+	}
+
 	BOOL handleCtrlSignal(DWORD signal);
 private:
 	void initProfiling();

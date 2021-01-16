@@ -10,6 +10,7 @@
 
 #include <chrono>
 #include <thread>
+#include <fstream>
 
 int runConfigurationWorker()
 {
@@ -95,6 +96,9 @@ void ConfigurationWorker::parsePutMessage(rapidjson::Document& doc)
             }
             else if (on.compare("connection.state") == 0) {
                 return parseConnectionStatePutMessage(doc);
+            }
+            else if (on.compare("config") == 0) {
+                return parseConfigPutMessage(doc);
             }
             else {
                 socket->SendLine(getErrorResponse("Unknown ressource of \"on\": " + on));
@@ -291,6 +295,71 @@ void ConfigurationWorker::parseDriverStatePutMessage(rapidjson::Document& doc)
     }
 }
 
+void ConfigurationWorker::parseConfigPutMessage(rapidjson::Document& doc)
+{
+    if (!doc.HasMember("data")) {
+        socket->SendLine(getErrorResponse("The Put request needs a \"type\" member"));
+        return;
+    }
+
+    if (!doc["data"].IsObject()) {
+        socket->SendLine(getErrorResponse("Member \"data\" needs to be an object"));
+        return;
+    }
+
+    rapidjson::Value& data = doc["data"];
+
+    AppConfig conf{};
+
+    std::ifstream inFile(Application::Get()->getConfigFilePath(), std::ios::in | std::ios::binary);
+    conf.read(inFile);
+
+    if (doc.HasMember("logLevel") && doc["logLevel"].IsString()) {
+        conf.logLevel = getLogLevelFromString(doc["logLevel"].GetString());
+    }
+
+    if (doc.HasMember("serverIp") && doc["serverIp"].IsString()) {
+        try {
+            conf.serverIp = *parseIpString(doc["serverIp"].GetString());
+        }
+        catch (...) {
+            NS_LOG_WARN("Unable to parse ip address {}", doc["serverIp"].GetString());
+        }
+    }
+
+    if (doc.HasMember("serverPort") && doc["serverPort"].IsInt()) {
+        conf.serverPort = doc["serverPort"].GetInt();
+    }
+
+    if (doc.HasMember("adapterIp") && doc["adapterIp"].IsString()) {
+        try {
+            conf.adapterIp = *parseIpString(doc["adapterIp"].GetString());
+        }  
+        catch (...) {
+            NS_LOG_WARN("Unable to parse ip adress {}", doc["adapterIp"].GetString());
+        }
+    }
+
+    if (doc.HasMember("adapterSubnetBits") && doc["adapterSubnetBits"].IsInt()) {
+        conf.adapterSubnetBits = doc["adapterSubnetBits"].GetInt();
+    }
+
+    if (doc.HasMember("names") && doc["names"].IsArray()) {
+        rapidjson::GenericArray<false, rapidjson::Value> names = doc["names"].GetArray();
+
+        for (int i = 0; i < names.Size(); i++) {
+            rapidjson::Value value = names.PopBack();
+            if (value.IsString()) {
+                conf.names->push_back(value.GetString());
+            }
+        }
+    }
+
+    std::ofstream outFile(Application::Get()->getConfigFilePath(), std::ios::out | std::ios::binary);
+
+    conf.write(outFile);
+}
+
 void ConfigurationWorker::parseDeamonStatePutMessage(rapidjson::Document& doc)
 {
     if (!doc.HasMember("data")) {
@@ -383,6 +452,11 @@ std::string ConfigurationWorker::getDriverStateResponse(std::string state)
     writer.EndObject();
 
     return s.GetString();
+}
+
+ns::log::LogLevel ConfigurationWorker::getLogLevelFromString(std::string logLevel)
+{
+    return ns::log::LogLevel();
 }
 
 void ConfigurationWorker::run()
