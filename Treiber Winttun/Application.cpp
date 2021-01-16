@@ -86,13 +86,15 @@ bool Application::initRun()
         internalConfig->write(outFile);
         outFile.close();
     }
-    try {
-        NS_LOG_APP_TRACE("Reading internal config");
-        internalConfig->read(file);
-    }
-    catch (...) {
-        NS_LOG_APP_ERROR("Error reading config file");
-        return false;
+    else {
+        try {
+            NS_LOG_APP_TRACE("Reading internal config");
+            internalConfig->read(file);
+        }
+        catch (...) {
+            NS_LOG_APP_ERROR("Error reading config file");
+            return false;
+        }
     }
     file.close();
 
