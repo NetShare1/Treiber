@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Socket.h"
+#include "log.h"
 
 #include "rapidjson/document.h"
 
