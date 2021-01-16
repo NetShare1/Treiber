@@ -8,6 +8,9 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 
+#include <chrono>
+#include <thread>
+
 int runConfigurationWorker()
 {
 	SocketServer in(5260, 3);
@@ -87,6 +90,9 @@ void ConfigurationWorker::parsePutMessage(rapidjson::Document& doc)
             if (on.compare("driver.state") == 0) {
                 return parseDriverStatePutMessage(doc);
             }
+            else if (on.compare("deamon.state") == 0) {
+                parseDeamonStatePutMessage(doc);
+            }
             else if (on.compare("connection.state") == 0) {
                 return parseConnectionStatePutMessage(doc);
             }
@@ -162,6 +168,42 @@ std::string ConfigurationWorker::getErrorResponse(std::string errorMessage)
     writer.StartObject();
     writer.Key("error");
     writer.String(errorMessage.c_str());
+    writer.EndObject();
+    writer.EndObject();
+
+    return s.GetString();
+}
+
+std::string ConfigurationWorker::getDeamonStateUpdate(std::string state)
+{
+    rapidjson::StringBuffer s;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+
+    writer.StartObject();
+    writer.Key("type");
+    writer.String("Update");
+    writer.Key("data");
+    writer.StartObject();
+    writer.Key("state");
+    writer.String(state.c_str());
+    writer.EndObject();
+    writer.EndObject();
+
+    return s.GetString();
+}
+
+std::string ConfigurationWorker::getDeamonStateResponse(std::string state)
+{
+    rapidjson::StringBuffer s;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+
+    writer.StartObject();
+    writer.Key("type");
+    writer.String("Response");
+    writer.Key("data");
+    writer.StartObject();
+    writer.Key("state");
+    writer.String(state.c_str());
     writer.EndObject();
     writer.EndObject();
 
@@ -245,6 +287,64 @@ void ConfigurationWorker::parseDriverStatePutMessage(rapidjson::Document& doc)
     }
     else {
         socket->SendLine(getErrorResponse("Member \"data.state\" needs to be ether \"running\" or \"stopped\""));
+        return;
+    }
+}
+
+void ConfigurationWorker::parseDeamonStatePutMessage(rapidjson::Document& doc)
+{
+    if (!doc.HasMember("data")) {
+        socket->SendLine(getErrorResponse("The Put request needs a \"type\" member"));
+        return;
+    }
+
+    if (!doc["data"].IsObject()) {
+        socket->SendLine(getErrorResponse("Member \"data\" needs to be an object"));
+        return;
+    }
+
+    rapidjson::Value& data = doc["data"];
+    if (!data.HasMember("state")) {
+        socket->SendLine(getErrorResponse("Member \"data\" needs to have a member \"state\""));
+        return;
+    }
+
+    if (!data["state"].IsString()) {
+        socket->SendLine(getErrorResponse("Member \"data.state\" needs to be a string"));
+        return;
+    }
+
+    std::string state = data["state"].GetString();
+
+    if (state.compare("stopped") == 0) {
+        Application* app = Application::Get();
+
+        NS_LOG_APP_INFO("Stopping deamon...");
+
+        while (true) {
+            if (app->isStartingUp()) {
+                socket->SendLine(getDeamonStateUpdate("worker.startup"));
+            }
+
+            if (app->isRunning()) {
+                socket->SendLine(getDeamonStateUpdate("worker.running"));
+                Application::Get()->shutdown();
+            }
+
+            if (!app->isRunning()) {
+                socket->SendLine(getDeamonStateUpdate("worker.stopped"));
+                break;
+            }
+
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+
+        socket->SendLine(getDeamonStateResponse("stopped"));
+        NS_LOG_APP_INFO("Stopping Application.");
+        exit(0);
+    }
+    else {
+        socket->SendLine(getErrorResponse("Member \"data.state\" can only be \"stopped\""));
         return;
     }
 }

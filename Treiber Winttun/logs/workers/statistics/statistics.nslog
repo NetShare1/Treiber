@@ -864,4 +864,201 @@
 [23:40:21.517633] [I] [thread 35208] max sending...   3614 Bits/Second
 [23:40:21.518968] [I] [thread 35208] max receiving... 0 Bits/Second
 [23:40:21.520614] [I] [thread 35208] bits sent...     13026
-[23:40:21.522391] [I] [thread 3
+[23:40:21.522391] [I] [thread 3[15:40:49.566644] [I] [thread 30208] sending...       188 Bits/Second
+[15:40:49.568682] [I] [thread 30208] receiving...     0 Bits/Second
+[15:40:49.570731] [I] [thread 30208] max sending...   188 Bits/Second
+[15:40:49.572013] [I] [thread 30208] max receiving... 0 Bits/Second
+[15:40:49.573509] [I] [thread 30208] bits sent...     188
+[15:40:49.574879] [I] [thread 30208] bits received... 0
+[15:40:50.579450] [I] [thread 30208] sending...       1450 Bits/Second
+[15:40:50.580125] [I] [thread 30208] receiving...     0 Bits/Second
+[15:40:50.581184] [I] [thread 30208] max sending...   1450 Bits/Second
+[15:40:50.582589] [I] [thread 30208] max receiving... 0 Bits/Second
+[15:40:50.584899] [I] [thread 30208] bits sent...     1638
+[15:40:50.586446] [I] [thread 30208] bits received... 0
+[15:40:51.587631] [I] [thread 30208] sending...       222 Bits/Second
+[15:40:51.588525] [I] [thread 30208] receiving...     0 Bits/Second
+[15:40:51.589735] [I] [thread 30208] max sending...   1450 Bits/Second
+[15:40:51.591600] [I] [thread 30208] max receiving... 0 Bits/Second
+[15:40:51.592696] [I] [thread 30208] bits sent...     1860
+[15:40:51.593881] [I] [thread 30208] bits received... 0
+[15:40:52.508074] [D] [thread 35888] Shutting down Statistics
+[15:40:52.517858] [D] [thread 30208] Shutting down Calc thread
+[15:41:51.264936] [I] [thread 33656] sending...       188 Bits/Second
+[15:41:51.266328] [I] [thread 33656] receiving...     0 Bits/Second
+[15:41:51.268691] [I] [thread 33656] max sending...   188 Bits/Second
+[15:41:51.272259] [I] [thread 33656] max receiving... 0 Bits/Second
+[15:41:51.284345] [I] [thread 33656] bits sent...     188
+[15:41:51.286367] [I] [thread 33656] bits received... 0
+[15:41:52.292336] [I] [thread 33656] sending...       1622 Bits/Second
+[15:41:52.293591] [I] [thread 33656] receiving...     0 Bits/Second
+[15:41:52.295268] [I] [thread 33656] max sending...   1622 Bits/Second
+[15:41:52.297033] [I] [thread 33656] max receiving... 0 Bits/Second
+[15:41:52.298626] [I] [thread 33656] bits sent...     1810
+[15:41:52.300255] [I] [thread 33656] bits received... 0
+[15:41:52.518601] [D] [thread 6204] Shutting down Statistics
+[15:41:52.527371] [D] [thread 33656] Shutting down Calc thread
+[15:42:06.280269] [I] [thread 2160] sending...       264 Bits/Second
+[15:42:06.281778] [I] [thread 2160] receiving...     0 Bits/Second
+[15:42:06.287506] [I] [thread 2160] max sending...   264 Bits/Second
+[15:42:06.289099] [I] [thread 2160] max receiving... 0 Bits/Second
+[15:42:06.292207] [I] [thread 2160] bits sent...     264
+[15:42:06.293765] [I] [thread 2160] bits received... 0
+[15:42:07.304350] [I] [thread 2160] sending...       1490 Bits/Second
+[15:42:07.305617] [I] [thread 2160] receiving...     0 Bits/Second
+[15:42:07.307298] [I] [thread 2160] max sending...   1490 Bits/Second
+[15:42:07.309243] [I] [thread 2160] max receiving... 0 Bits/Second
+[15:42:07.311728] [I] [thread 2160] bits sent...     1754
+[15:42:07.313327] [I] [thread 2160] bits received... 0
+[15:42:08.318327] [I] [thread 2160] sending...       50 Bits/Second
+[15:42:08.319551] [I] [thread 2160] receiving...     0 Bits/Second
+[15:42:08.321496] [I] [thread 2160] max sending...   1490 Bits/Second
+[15:42:08.322930] [I] [thread 2160] max receiving... 0 Bits/Second
+[15:42:08.324217] [I] [thread 2160] bits sent...     1804
+[15:42:08.327106] [I] [thread 2160] bits received... 0
+[15:42:09.331190] [I] [thread 2160] sending...       1462 Bits/Second
+[15:42:09.332299] [I] [thread 2160] receiving...     0 Bits/Second
+[15:42:09.334240] [I] [thread 2160] max sending...   1490 Bits/Second
+[15:42:09.335643] [I] [thread 2160] max receiving... 0 Bits/Second
+[15:42:09.337134] [I] [thread 2160] bits sent...     3266
+[15:42:09.338839] [I] [thread 2160] bits received... 0
+[15:42:10.343952] [I] [thread 2160] sending...       0 Bits/Second
+[15:42:10.345419] [I] [thread 2160] receiving...     0 Bits/Second
+[15:42:10.346519] [I] [thread 2160] max sending...   1490 Bits/Second
+[15:42:10.347501] [I] [thread 2160] max receiving... 0 Bits/Second
+[15:42:10.348854] [I] [thread 2160] bits sent...     3266
+[15:42:10.349788] [I] [thread 2160] bits received... 0
+[15:42:11.176866] [D] [thread 19364] Shutting down Statistics
+[15:42:11.189587] [D] [thread 2160] Shutting down Calc thread
+[15:46:25.369626] [I] [thread 17560] sending...       188 Bits/Second
+[15:46:25.370994] [I] [thread 17560] receiving...     0 Bits/Second
+[15:46:25.372992] [I] [thread 17560] max sending...   188 Bits/Second
+[15:46:25.374983] [I] [thread 17560] max receiving... 0 Bits/Second
+[15:46:25.377539] [I] [thread 17560] bits sent...     188
+[15:46:25.387115] [I] [thread 17560] bits received... 0
+[15:46:26.389852] [I] [thread 17560] sending...       944 Bits/Second
+[15:46:26.392319] [I] [thread 17560] receiving...     0 Bits/Second
+[15:46:26.403833] [I] [thread 17560] max sending...   944 Bits/Second
+[15:46:26.405547] [I] [thread 17560] max receiving... 0 Bits/Second
+[15:46:26.419293] [I] [thread 17560] bits sent...     1132
+[15:46:26.432913] [I] [thread 17560] bits received... 0
+[15:46:27.444853] [I] [thread 17560] sending...       722 Bits/Second
+[15:46:27.446104] [I] [thread 17560] receiving...     0 Bits/Second
+[15:46:27.447705] [I] [thread 17560] max sending...   944 Bits/Second
+[15:46:27.449490] [I] [thread 17560] max receiving... 0 Bits/Second
+[15:46:27.451327] [I] [thread 17560] bits sent...     1854
+[15:46:27.453157] [I] [thread 17560] bits received... 0
+[15:46:28.460093] [I] [thread 17560] sending...       1342 Bits/Second
+[15:46:28.462073] [I] [thread 17560] receiving...     0 Bits/Second
+[15:46:28.462958] [I] [thread 17560] max sending...   1342 Bits/Second
+[15:46:28.463899] [I] [thread 17560] max receiving... 0 Bits/Second
+[15:46:28.464990] [I] [thread 17560] bits sent...     3196
+[15:46:28.465921] [I] [thread 17560] bits received... 0
+[15:46:29.467818] [I] [thread 17560] sending...       144 Bits/Second
+[15:46:29.469363] [I] [thread 17560] receiving...     0 Bits/Second
+[15:46:29.471331] [I] [thread 17560] max sending...   1342 Bits/Second
+[15:46:29.472965] [I] [thread 17560] max receiving... 0 Bits/Second
+[15:46:29.474604] [I] [thread 17560] bits sent...     3340
+[15:46:29.476722] [I] [thread 17560] bits received... 0
+[15:46:30.483539] [I] [thread 17560] sending...       197 Bits/Second
+[15:46:30.485056] [I] [thread 17560] receiving...     0 Bits/Second
+[15:46:30.487255] [I] [thread 17560] max sending...   1342 Bits/Second
+[15:46:30.488981] [I] [thread 17560] max receiving... 0 Bits/Second
+[15:46:30.490786] [I] [thread 17560] bits sent...     3537
+[15:46:30.495767] [I] [thread 17560] bits received... 0
+[15:46:31.502963] [I] [thread 17560] sending...       1709 Bits/Second
+[15:46:31.504309] [I] [thread 17560] receiving...     0 Bits/Second
+[15:46:31.505934] [I] [thread 17560] max sending...   1709 Bits/Second
+[15:46:31.509308] [I] [thread 17560] max receiving... 0 Bits/Second
+[15:46:31.517097] [I] [thread 17560] bits sent...     5246
+[15:46:31.534805] [I] [thread 17560] bits received... 0
+[15:46:31.766802] [D] [thread 35472] Shutting down Statistics
+[15:46:31.768997] [D] [thread 17560] Shutting down Calc thread
+[15:49:08.835347] [I] [thread 260] sending...       264 Bits/Second
+[15:49:08.836806] [I] [thread 260] receiving...     0 Bits/Second
+[15:49:08.838255] [I] [thread 260] max sending...   264 Bits/Second
+[15:49:08.839556] [I] [thread 260] max receiving... 0 Bits/Second
+[15:49:08.840996] [I] [thread 260] bits sent...     264
+[15:49:08.842182] [I] [thread 260] bits received... 0
+[15:49:09.843699] [I] [thread 260] sending...       1546 Bits/Second
+[15:49:09.844377] [I] [thread 260] receiving...     0 Bits/Second
+[15:49:09.845587] [I] [thread 260] max sending...   1546 Bits/Second
+[15:49:09.846737] [I] [thread 260] max receiving... 0 Bits/Second
+[15:49:09.847770] [I] [thread 260] bits sent...     1810
+[15:49:09.848788] [I] [thread 260] bits received... 0
+[15:49:10.850597] [I] [thread 260] sending...       50 Bits/Second
+[15:49:10.851701] [I] [thread 260] receiving...     0 Bits/Second
+[15:49:10.853466] [I] [thread 260] max sending...   1546 Bits/Second
+[15:49:10.855293] [I] [thread 260] max receiving... 0 Bits/Second
+[15:49:10.857063] [I] [thread 260] bits sent...     1860
+[15:49:10.858198] [I] [thread 260] bits received... 0
+[15:49:11.859263] [I] [thread 260] sending...       1486 Bits/Second
+[15:49:11.860279] [I] [thread 260] receiving...     0 Bits/Second
+[15:49:11.861977] [I] [thread 260] max sending...   1546 Bits/Second
+[15:49:11.863292] [I] [thread 260] max receiving... 0 Bits/Second
+[15:49:11.865274] [I] [thread 260] bits sent...     3346
+[15:49:11.866786] [I] [thread 260] bits received... 0
+[15:49:12.868947] [I] [thread 260] sending...       0 Bits/Second
+[15:49:12.870273] [I] [thread 260] receiving...     0 Bits/Second
+[15:49:12.871996] [I] [thread 260] max sending...   1546 Bits/Second
+[15:49:12.873543] [I] [thread 260] max receiving... 0 Bits/Second
+[15:49:12.874870] [I] [thread 260] bits sent...     3346
+[15:49:12.876253] [I] [thread 260] bits received... 0
+[15:49:13.877935] [I] [thread 260] sending...       1349 Bits/Second
+[15:49:13.879043] [I] [thread 260] receiving...     0 Bits/Second
+[15:49:13.880927] [I] [thread 260] max sending...   1546 Bits/Second
+[15:49:13.882314] [I] [thread 260] max receiving... 0 Bits/Second
+[15:49:13.883793] [I] [thread 260] bits sent...     4695
+[15:49:13.885109] [I] [thread 260] bits received... 0
+[15:49:14.887218] [I] [thread 260] sending...       1349 Bits/Second
+[15:49:14.888246] [I] [thread 260] receiving...     0 Bits/Second
+[15:49:14.890034] [I] [thread 260] max sending...   1546 Bits/Second
+[15:49:14.891823] [I] [thread 260] max receiving... 0 Bits/Second
+[15:49:14.893927] [I] [thread 260] bits sent...     6044
+[15:49:14.895900] [I] [thread 260] bits received... 0
+[15:49:15.903079] [I] [thread 260] sending...       197 Bits/Second
+[15:49:15.904487] [I] [thread 260] receiving...     0 Bits/Second
+[15:49:15.906177] [I] [thread 260] max sending...   1546 Bits/Second
+[15:49:15.907673] [I] [thread 260] max receiving... 0 Bits/Second
+[15:49:15.909043] [I] [thread 260] bits sent...     6241
+[15:49:15.910829] [I] [thread 260] bits received... 0
+[15:49:16.914899] [I] [thread 260] sending...       509 Bits/Second
+[15:49:16.916413] [I] [thread 260] receiving...     0 Bits/Second
+[15:49:16.917857] [I] [thread 260] max sending...   1546 Bits/Second
+[15:49:16.919339] [I] [thread 260] max receiving... 0 Bits/Second
+[15:49:16.920712] [I] [thread 260] bits sent...     6750
+[15:49:16.922132] [I] [thread 260] bits received... 0
+[15:49:17.924777] [I] [thread 260] sending...       312 Bits/Second
+[15:49:17.925027] [D] [thread 18580] Shutting down Statistics
+[15:49:17.937163] [I] [thread 260] receiving...     0 Bits/Second
+[15:49:17.947330] [I] [thread 260] max sending...   1546 Bits/Second
+[15:49:17.948572] [I] [thread 260] max receiving... 0 Bits/Second
+[15:49:17.954751] [I] [thread 260] bits sent...     7062
+[15:49:17.958826] [I] [thread 260] bits received... 0
+[15:49:17.960126] [D] [thread 260] Shutting down Calc thread
+[15:49:58.365844] [I] [thread 15724] sending...       264 Bits/Second
+[15:49:58.368212] [I] [thread 15724] receiving...     0 Bits/Second
+[15:49:58.370034] [I] [thread 15724] max sending...   264 Bits/Second
+[15:49:58.371846] [I] [thread 15724] max receiving... 0 Bits/Second
+[15:49:58.373812] [I] [thread 15724] bits sent...     264
+[15:49:58.379129] [I] [thread 15724] bits received... 0
+[15:49:59.386058] [I] [thread 15724] sending...       1490 Bits/Second
+[15:49:59.387168] [I] [thread 15724] receiving...     0 Bits/Second
+[15:49:59.388409] [I] [thread 15724] max sending...   1490 Bits/Second
+[15:49:59.389517] [I] [thread 15724] max receiving... 0 Bits/Second
+[15:49:59.390297] [I] [thread 15724] bits sent...     1754
+[15:49:59.391235] [I] [thread 15724] bits received... 0
+[15:50:00.393097] [I] [thread 15724] sending...       50 Bits/Second
+[15:50:00.394057] [I] [thread 15724] receiving...     0 Bits/Second
+[15:50:00.395107] [I] [thread 15724] max sending...   1490 Bits/Second
+[15:50:00.396358] [I] [thread 15724] max receiving... 0 Bits/Second
+[15:50:00.397564] [I] [thread 15724] bits sent...     1804
+[15:50:00.398856] [I] [thread 15724] bits received... 0
+[15:50:01.402315] [I] [thread 15724] sending...       1518 Bits/Second
+[15:50:01.403656] [I] [thread 15724] receiving...     0 Bits/Second
+[15:50:01.405035] [I] [thread 15724] max sending...   1518 Bits/Second
+[15:50:01.406322] [I] [thread 15724] max receiving... 0 Bits/Second
+[15:50:01.407355] [I] [thread 15724] bits sent...     3322
+[15:50:01.408290] [I] [thread 15724] bits received... 0
+[15:50:01.899431] [D] [thread 18692] Shutting down Statistics
+[15:50:01.904527] [D] [thread 15724] Shutting down Calc thread

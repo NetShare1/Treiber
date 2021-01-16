@@ -66,6 +66,15 @@ void killDeamon(int listenPort) {
             if (state.compare("stopped") == 0) {
                 std::cout << "VPN Worker Deamon has stopped" << std::endl;
             }
+            else if (state.compare("worker.startup") == 0) {
+                std::cout << "VPN Worker ist starting up. Waiting for it to finish..." << std::endl;
+            }
+            else if (state.compare("worker.running") == 0) {
+                std::cout << "VPN Worker is currently running. Shutting it down..." << std::endl;
+            }
+            else if (state.compare("worker.stopped") == 0) {
+                std::cout << "VPN Worker is now not running. Killing deamon..." << std::endl;
+            }
 
             if (isResponse(resDoc)) {
                 s.SendLine(getStopConnectionRequest());

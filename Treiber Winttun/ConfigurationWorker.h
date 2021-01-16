@@ -23,7 +23,13 @@ private:
 
 	void parseDriverStatePutMessage(rapidjson::Document& doc);
 
+	void parseDeamonStatePutMessage(rapidjson::Document& doc);
+
 	std::string getErrorResponse(std::string errorMessage);
+
+	std::string getDeamonStateUpdate(std::string state);
+	std::string getDeamonStateResponse(std::string state);
+
 	std::string getDriverStateUpdate(std::string state);
 	std::string getDriverStateResponse(std::string state);
 
