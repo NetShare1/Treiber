@@ -6,6 +6,7 @@
 #include "startDriver.h"
 #include "stopDriver.h"
 #include "killDeamon.h"
+#include "configureDriver.h"
 
 #include "CLI11.hpp"
 
@@ -58,7 +59,7 @@ int main(int argc, char* argv[])
         stopDriver(driverPort);
     }
     else if (configure->parsed()) {
-        //configureDriver();
+        configureDriver(driverPort);
     }
     else if (print->parsed()) {
         //printDriver();
@@ -71,14 +72,6 @@ int main(int argc, char* argv[])
     }
 }
 
-
-
-
-
-
-void configureDriver() {
-    std::cout << "Starting to configure ..." << std::endl;
-}
 
 void printDriver() {
     std::cout << "Printint stats ..." << std::endl;
