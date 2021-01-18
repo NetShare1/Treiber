@@ -12,12 +12,6 @@
 #include <string>
 #include <vector>
 
-struct Adapter {
-    std::string name;
-    std::string ip;
-    std::string displayName;
-};
-
 void configureDriver(int aListenPort) {
     try {
         SocketClient s("localhost", aListenPort);
