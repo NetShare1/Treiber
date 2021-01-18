@@ -9,7 +9,7 @@ Currently there are two projects in this solution. The CLI and the driver itself
 ## Install
 
 1. Clone the git repository to your computer
-   * ```git clone  https://github.com/NetShare1/Treiber.git```
+   * ```git clone --recurse-submodules https://github.com/NetShare1/Treiber.git```
 2. Install the Windows Driver Development Kit
    * A toturial on how to do that can you find [here](https://docs.microsoft.com/en-us/windows-hardware/drivers/download-the-wdk).
 3. Build the CLI
