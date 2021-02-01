@@ -168,5 +168,9 @@ namespace ns {
             }
         }
 
+        void setLogLevel(LogLevel lvl)
+        {
+        }
+
     }
 }

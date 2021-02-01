@@ -16,7 +16,7 @@ static DWORD WINAPI
 ReceivePackets(_Inout_ std::shared_ptr<Config> conf)
 {
     MTR_META_THREAD_NAME("Wintun Receive Thread");
-    NS_CREATE_WORKER_LOGGER(NS_WINTUN_RECEIVE_LOG_NAME, ns::log::trace);
+    NS_CREATE_WORKER_LOGGER(NS_WINTUN_RECEIVE_LOG_NAME, conf->logLevel);
     WINTUN_SESSION_HANDLE Session = conf->sessionHandle;
     HANDLE WaitHandles[] = { WintunGetReadWaitEvent(Session), conf->quitEvent };
     int runFor = 11;
@@ -88,7 +88,7 @@ static DWORD WINAPI
 SendPackets(_Inout_ std::shared_ptr<Config> conf)
 {
     MTR_META_THREAD_NAME("Wintun Send Thread");
-    NS_CREATE_WORKER_LOGGER(NS_WINTUN_SEND_LOG_NAME, ns::log::trace);
+    NS_CREATE_WORKER_LOGGER(NS_WINTUN_SEND_LOG_NAME, conf->logLevel);
     WINTUN_SESSION_HANDLE Session = conf->sessionHandle;
     HANDLE WaitHandles[] = { conf->quitEvent };
 

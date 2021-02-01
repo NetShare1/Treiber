@@ -132,7 +132,25 @@ public:
 
 		return configs;
 	}
-	
+
+	bool hasActivatedNetworkAdapters() {
+		for (
+			std::vector<std::pair<bool, NetworkAdapter*>*>::iterator it = adapterList->begin();
+			it != adapterList->end();
+			++it
+		) {
+			// if is in use
+			if ((*it)->first) {
+				return true;
+			}
+
+		}
+		return false;
+	}
+
+	std::vector<std::pair<bool, NetworkAdapter*>*>* getAdapterList() {
+		return adapterList;
+	}
 
 private:
 

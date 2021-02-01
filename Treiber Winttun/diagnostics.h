@@ -14,7 +14,7 @@ class Statistics {
 public:
 
     Statistics() {
-        NS_CREATE_WORKER_LOGGER("statistics", ns::log::trace);
+        NS_CREATE_WORKER_LOGGER("statistics", ns::log::info);
         statsCalcuatorThread = new std::thread([this]() {
             MTR_META_THREAD_NAME("Statistics Calculator Thread");
             this->calculateStats();

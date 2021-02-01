@@ -46,6 +46,10 @@ public:
 		return startingUp;
 	}
 
+	std::string getCrashReason() {
+		return crashReason;
+	}
+
 	std::shared_ptr<Config> getConfig() {
 		return conf;
 	}
@@ -70,6 +74,9 @@ public:
 	}
 
 	BOOL handleCtrlSignal(DWORD signal);
+
+	ns::log::LogLevel logLevel = ns::log::debug;
+
 private:
 	void initProfiling();
 	void shutdownProfiling();
@@ -106,6 +113,8 @@ private:
 
 	bool exited = true;
 	bool startingUp = false;
+	bool crashed = false;
+	std::string crashReason = "";
 
 #ifdef NS_PERF_PROFILE
 	std::thread* metricsThread;

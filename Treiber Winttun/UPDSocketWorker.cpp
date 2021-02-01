@@ -136,7 +136,7 @@ int WorkSocket(std::shared_ptr<UDPWorkerConfig> conf) {
 	conf->reciever ? loggerName.append("receiver-") : loggerName.append("sender-");
 	loggerName.append(std::to_string(conf->uid));
 
-	NS_CREATE_WORKER_LOGGER(loggerName, ns::log::trace);
+	NS_CREATE_WORKER_LOGGER(loggerName, conf->conf->logLevel);
 
 
 	WSADATA wsaData;

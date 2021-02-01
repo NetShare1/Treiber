@@ -54,6 +54,8 @@ bool Application::initRun()
 {
     initProfiling();
 
+    crashed = false;
+    crashReason = "";
     exited = false;
     startingUp = true;
 
@@ -75,13 +77,9 @@ bool Application::initRun()
         internalConfig->serverIp.ipp4 = 159;
         internalConfig->serverPort = 5555;
 
-        internalConfig->names->push_back("{C4501663-4776-442F-86BD-8373C8583219}");
-        internalConfig->names->push_back("{C9C041C1-2F18-49BD-A8EF-5CC7BE5D4F63}");
-        internalConfig->names->push_back("{BF52BB84-63C6-493C-9FB3-82A5917D3521}");
-        internalConfig->names->push_back("{B6BBCC6F-E3F6-47AF-8869-B52D441F9AE8}");
-        internalConfig->names->push_back("{251C104E-9987-4CB5-986F-C2CE287B4429}");
+        internalConfig->names->push_back("{8AB7398C-5F9B-44E1-BC1B-8B9A64EBDD30}");
 
-        internalConfig->logLevel = ns::log::debug;
+        internalConfig->logLevel = ns::log::info;
 
         internalConfig->write(outFile);
         outFile.close();
@@ -108,6 +106,26 @@ bool Application::initRun()
     conf->winTunAdapterIpv4Adress = internalConfig->adapterIp;
     conf->winTunAdapterSubnetBits = internalConfig->adapterSubnetBits;
 
+    conf->logLevel = internalConfig->logLevel;
+
+    logLevel = internalConfig->logLevel;
+
+    adapterList = new NetworkAdapterList();
+    adapterList->init();
+
+    adapterList->deactiveEverythingBut(adapterNames->data(), adapterNames->size());
+
+    if (!adapterList->hasActivatedNetworkAdapters()) {
+        conf->isRunning = false;
+        conf->stats.shutdown();
+        crashed = true;
+        crashReason = "NO_ACTIVATED_ADAPTERS";
+        NS_LOG_APP_CRITICAL("Can not startup because no adapter is up that is also activated");
+        return false;
+    }
+
+
+
     HMODULE Wintun = InitializeWintun();
     if (!Wintun) {
         NS_LOG_APP_ERROR("Failed to initialize Wintun: {}", GetLastErrorAsString());
@@ -118,12 +136,6 @@ bool Application::initRun()
     NS_LOG_APP_DEBUG("Sucessfully loaded wintun dll");
 
     WintunSetLogger(ns::log::WintunLoggerFunc);
-
-    adapterList = new NetworkAdapterList();
-    adapterList->init();
-
-    adapterList->deactiveEverythingBut(adapterNames->data(), adapterNames->size());
-
 
     conf->quitEvent = CreateEventW(NULL, TRUE, FALSE, NULL);
 

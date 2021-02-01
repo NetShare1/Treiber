@@ -61,7 +61,7 @@ void ConfigurationWorker::parseMessage(std::string request)
         if (requestDocument["type"].IsString()) {
             std::string type = requestDocument["type"].GetString();
             if (type.compare("Get") == 0) {
-            
+                return parseGetMessage(requestDocument);
             }
             else if (type.compare("Put") == 0) {
                 return parsePutMessage(requestDocument);
@@ -111,6 +111,59 @@ void ConfigurationWorker::parsePutMessage(rapidjson::Document& doc)
     }
     else {
         socket->SendLine(getErrorResponse("No member \"on\" provided."));
+    }
+}
+
+void ConfigurationWorker::parseGetMessage(rapidjson::Document& doc)
+{
+    if (doc.HasMember("on")) {
+        if (doc["on"].IsString()) {
+            std::string on = doc["on"].GetString();
+
+            if (on.compare("adapter.names") == 0) {
+                return parseAdapterGetMessage(doc);
+            }
+            else {
+                socket->SendLine(getErrorResponse("Unknown ressource of \"on\": " + on));
+            }
+        }
+        else {
+            socket->SendLine(getErrorResponse("Member \"on\" needs to be a string"));
+            return;
+        }
+    }
+    else {
+        socket->SendLine(getErrorResponse("No member \"on\" provided."));
+    }
+}
+
+void ConfigurationWorker::parseAdapterGetMessage(rapidjson::Document& doc)
+{
+    NetworkAdapterList* adapterListGetter = new NetworkAdapterList();
+    adapterListGetter->init();
+
+    std::vector<std::pair<bool, NetworkAdapter*>*>* adapterList = adapterListGetter->getAdapterList();
+
+
+
+    for (
+        std::vector<std::pair<bool, NetworkAdapter*>*>::iterator it = adapterList->begin();
+        it != adapterList->end();
+        ++it)
+    {
+        rapidjson::StringBuffer s;
+        rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+
+        writer.StartObject();
+        writer.Key("type");
+        writer.String("Response");
+        writer.Key("data");
+        writer.StartObject();
+        writer.Key("state");
+        writer.String("closed");
+        writer.EndObject();
+        writer.EndObject();
+
     }
 }
 
@@ -258,7 +311,7 @@ void ConfigurationWorker::parseDriverStatePutMessage(rapidjson::Document& doc)
             socket->SendLine(getDriverStateResponse("running"));
         }
         else {
-            socket->SendLine(getDriverStateResponse("crashed"));
+            socket->SendLine(getDriverStateResponse("crashed", true, app->getCrashReason()));
         }
     }
     else if (state.compare("stopped") == 0) {
@@ -436,7 +489,7 @@ std::string ConfigurationWorker::getDriverStateUpdate(std::string state)
     return s.GetString();
 }
 
-std::string ConfigurationWorker::getDriverStateResponse(std::string state)
+std::string ConfigurationWorker::getDriverStateResponse(std::string state, bool crashed, std::string crashReason)
 {
     rapidjson::StringBuffer s;
     rapidjson::Writer<rapidjson::StringBuffer> writer(s);
@@ -448,6 +501,12 @@ std::string ConfigurationWorker::getDriverStateResponse(std::string state)
     writer.StartObject();
     writer.Key("state");
     writer.String(state.c_str());
+
+    if (crashed) {
+        writer.Key("crashReason");
+        writer.String(crashReason.c_str());
+    }
+
     writer.EndObject();
     writer.EndObject();
 

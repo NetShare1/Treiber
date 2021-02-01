@@ -7,6 +7,7 @@
 #include "wintun.h"
 #include "Workqueue.h"
 #include "diagnostics.h"
+#include "log.h"
 
 #include <stdint.h>
 #include <fstream>
@@ -92,5 +93,7 @@ public:
 	
 	HANDLE quitEvent;
 	bool isRunning;
+
+	ns::log::LogLevel logLevel;
 };
 
